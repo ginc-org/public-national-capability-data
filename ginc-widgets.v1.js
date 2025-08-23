@@ -1,145 +1,240 @@
-// /assets/js/ginc-widgets.v1.js
-(function (root) {
-  const state = { cache: null, opts: null };
+// ginc-capability-table.js
+(() => {
+  const DEFAULT_CSV_URL = "https://ginc-org.github.io/public-national-capability-data/ginc-pillar-ratings.csv";
+  const WIDGET_SELECTOR = '[data-widget="capability-table"]';
+  const BASE_COUNTRY_URL = "https://www.ginc.org/";
 
-  async function loadCSV(url) {
-    if (state.cache) return state.cache;
-    const res = await fetch(url, { cache: 'force-cache' });
-    if (!res.ok) throw new Error(`CSV ${res.status}`);
-    const text = await res.text();
-    const parsed = Papa.parse(text, { header: true, dynamicTyping: true, skipEmptyLines: true });
-    if (parsed.errors?.length) console.warn('[GINC] CSV parse issues:', parsed.errors);
-    state.cache = parsed.data;
-    return state.cache;
-  }
-
-  // ---- Mini “API” over the CSV
-  const api = {
-    async all() { return await loadCSV(state.opts.dataUrl); },
-    async byISOList(isos) {
-      const all = await this.all();
-      const set = new Set(isos.map(x => x.toUpperCase()));
-      return all.filter(r => set.has((r.ISO || '').toUpperCase()));
-    },
-    groupBy(rows, key) {
-      return rows.reduce((m, r) => ((m[r[key]] ??= []).push(r), m), {});
-    }
+  // --- Styles: plain table, no borders; add subtle rating separators ---
+  const injectStyles = () => {
+    if (document.getElementById("ginc-capability-table-styles")) return;
+    const css = `
+      .ginc-cap-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+      .ginc-cap-table th, .ginc-cap-table td { padding: 8px 10px; vertical-align: top; }
+      .ginc-cap-table thead th { text-align: left; font-weight: 600; }
+      .ginc-cap-table-caption { margin: 6px 0 12px; color: #666; font-size: 0.9rem; }
+      .ginc-cap-error { color: #b00020; }
+      .ginc-cap-sep td { padding: 10px 10px 6px; font-weight: 700; color: #333; }
+      /* intentionally no borders or zebra striping */
+    `;
+    const style = document.createElement("style");
+    style.id = "ginc-capability-table-styles";
+    style.textContent = css;
+    document.head.appendChild(style);
   };
 
-  // ---- Rendering helpers
-  function cssOnce() {
-    if (document.getElementById('ginc-widgets-css')) return;
-    const s = document.createElement('style');
-    s.id = 'ginc-widgets-css';
-    s.textContent = `
-      .ginc-card{border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.04);margin:1rem 0}
-      .ginc-title{background:#f8fafc;padding:12px 14px;font-weight:800}
-      .ginc-table{width:100%;border-collapse:collapse;table-layout:auto}
-      .ginc-table th,.ginc-table td{padding:10px 12px;border-top:1px solid #e5e7eb;vertical-align:top;text-align:left}
-      .ginc-table thead th{background:#fbfdff;color:#475569;text-transform:uppercase;font-size:12px;letter-spacing:.06em}
-      .ginc-sec{font-weight:900;letter-spacing:.02em}
-      .ginc-grp{font-weight:800}
-      .ginc-hard{background:#d6e3f6}
-      .ginc-soft{background:#f0d97e}
-      .ginc-econ{background:#dab8ff}
-      .ginc-hard-row{background:#e7eef9}
-      .ginc-soft-row{background:#f6e8b1}
-      .ginc-econ-row{background:#ead6ff}
-    `;
-    document.head.appendChild(s);
-  }
+  // --- CSV parsing (robust for quotes/commas/newlines) ---
+  const parseCSV = (csvText) => {
+    const rows = [];
+    let i = 0, field = "", row = [], inQuotes = false;
 
-  function sectionClass(section) {
-    if (/hard/i.test(section)) return ['ginc-hard','ginc-hard-row'];
-    if (/soft/i.test(section)) return ['ginc-soft','ginc-soft-row'];
-    return ['ginc-econ','ginc-econ-row'];
-  }
+    const pushField = () => { row.push(field); field = ""; };
+    const pushRow = () => { rows.push(row); row = []; };
 
-  function renderCapabilityTable(el, rows, isos) {
-    cssOnce();
-    const wrapper = document.createElement('div');
-    wrapper.className = 'ginc-card';
-    const title = document.createElement('div');
-    title.className = 'ginc-title';
-    title.textContent = `National Capability — ${isos.join(', ')}`;
-    wrapper.appendChild(title);
+    while (i < csvText.length) {
+      const char = csvText[i];
 
-    const tbl = document.createElement('table');
-    tbl.className = 'ginc-table';
-    // Dynamic columns per ISO
-    const theadRow = `<tr>
-      <th>Component</th>
-      ${isos.map(iso => `<th>${iso} Rating</th><th>${iso} Outlook</th><th>${iso} Date</th>`).join('')}
-    </tr>`;
-    tbl.innerHTML = `<thead>${theadRow}</thead><tbody></tbody>`;
-    const tb = tbl.querySelector('tbody');
-
-    // Group rows by Section -> Group -> Component
-    const grouped = api.groupBy(rows, 'Section');
-    for (const section of ['Hard Capability','Soft Capability','Economic Capability']) {
-      const [secCls] = sectionClass(section);
-      const secTr = document.createElement('tr');
-      secTr.className = `ginc-sec ${secCls}`;
-      secTr.innerHTML = `<td colspan="${1 + isos.length * 3}">${section.toUpperCase()}</td>`;
-      tb.appendChild(secTr);
-
-      const perGroup = api.groupBy((grouped[section]||[]), 'Group');
-      for (const groupName of Object.keys(perGroup)) {
-        const [, rowCls] = sectionClass(section);
-        const grpTr = document.createElement('tr');
-        grpTr.className = `ginc-grp ${rowCls}`;
-        grpTr.innerHTML = `<td colspan="${1 + isos.length * 3}">${groupName}</td>`;
-        tb.appendChild(grpTr);
-
-        // Group by Component + ISO
-        const byComponent = api.groupBy(perGroup[groupName], 'Component');
-        for (const comp of Object.keys(byComponent)) {
-          const tr = document.createElement('tr');
-          tr.className = rowCls;
-          let tds = `<td>${comp}</td>`;
-          for (const iso of isos) {
-            const record = byComponent[comp].find(r => (r.ISO || '').toUpperCase() === iso);
-            tds += `<td>${record?.Rating ?? ''}</td><td>${record?.Outlook ?? ''}</td><td>${record?.Date ?? ''}</td>`;
-          }
-          tr.innerHTML = tds;
-          tb.appendChild(tr);
-        }
+      if (inQuotes) {
+        if (char === '"') {
+          const next = csvText[i + 1];
+          if (next === '"') { field += '"'; i += 2; continue; }
+          inQuotes = false; i++; continue;
+        } else { field += char; i++; continue; }
+      } else {
+        if (char === '"') { inQuotes = true; i++; continue; }
+        if (char === ",") { pushField(); i++; continue; }
+        if (char === "\r") { i++; continue; }
+        if (char === "\n") { pushField(); pushRow(); i++; continue; }
+        field += char; i++; continue;
       }
     }
-    wrapper.appendChild(tbl);
-    el.replaceWith(wrapper);
-  }
-
-  async function bootOne(el) {
-    const widget = (el.getAttribute('data-widget') || '').toLowerCase();
-    const isos = (el.getAttribute('data-iso') || '')
-      .split(',')
-      .map(s => s.trim().toUpperCase())
-      .filter(Boolean);
-    if (!isos.length) {
-      console.warn('[GINC] Missing data-iso on element', el);
-      return;
-    }
-    const rows = await api.byISOList(isos);
-
-    switch (widget) {
-      case 'capability-table':
-        renderCapabilityTable(el, rows, isos);
-        break;
-      default:
-        renderCapabilityTable(el, rows, isos);
-    }
-  }
-
-  const GINC = {
-    init(opts) {
-      state.opts = Object.assign({ dataUrl: '/assets/data/capability.csv' }, opts || {});
-      document.querySelectorAll('[data-widget]').forEach(
-        el => bootOne(el).catch(err => console.error('[GINC] render error', err))
-      );
-    },
-    api
+    pushField();
+    if (row.length > 1 || (row.length === 1 && row[0] !== "")) pushRow();
+    return rows;
   };
 
-  root.GINC = GINC;
-})(window);
+  const toObjects = (rows) => {
+    if (!rows || rows.length === 0) return [];
+    const header = rows[0].map(h => (h || "").trim());
+    return rows.slice(1).map(r => {
+      const obj = {};
+      header.forEach((h, idx) => obj[h] = (r[idx] ?? "").trim());
+      return obj;
+    });
+  };
+
+  // --- Utils ---
+  const ci = (s = "") => s.trim().toLowerCase();
+  const pickKey = (obj, candidates) => {
+    const map = Object.keys(obj).reduce((acc, k) => { acc[ci(k)] = k; return acc; }, {});
+    for (const c of candidates) {
+      const k = map[ci(c)];
+      if (k) return k;
+    }
+    return null;
+  };
+  const escapeHTML = (v) => String(v)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+
+  // Country cell: emoji + space + linked country name (name only is linked)
+  const buildCountryHTML = (row, k) => {
+    const emoji = (row[k.emojiK] || "").trim();
+    const name  = (row[k.nameK]  || "").trim();
+    const slug  = (row[k.slugK]  || "").trim().replace(/^\/+/, "");
+    const flagPart = emoji ? `${escapeHTML(emoji)} ` : "";
+    if (slug) {
+      // Note: slug is appended as-is (encoded) after BASE_COUNTRY_URL
+      const url = BASE_COUNTRY_URL + encodeURIComponent(slug);
+      return `${flagPart}<a href="${url}">${escapeHTML(name)}</a>`;
+    }
+    return `${flagPart}${escapeHTML(name)}`;
+  };
+
+  // --- Rendering ---
+  const renderError = (mount, message) => {
+    mount.innerHTML = `<div class="ginc-cap-table ginc-cap-error">Error: ${escapeHTML(message)}</div>`;
+  };
+
+  const renderTable = (mount, rows, pillar, keys) => {
+    mount.innerHTML = "";
+
+    const caption = document.createElement("div");
+    caption.className = "ginc-cap-table-caption";
+    caption.textContent = `${pillar} — ${rows.length} countries`;
+    mount.appendChild(caption);
+
+    const table = document.createElement("table");
+    table.className = "ginc-cap-table";
+
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
+    ["Country", "Rating", "Outlook", "Date"].forEach(col => {
+      const th = document.createElement("th");
+      th.textContent = col;
+      trHead.appendChild(th);
+    });
+    thead.appendChild(trHead);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    // Insert a rating separator row whenever Rating changes while iterating sorted rows
+    let lastRating = null;
+    rows.forEach(row => {
+      const thisRating = (row[keys.ratingK] || "").trim();
+      if (thisRating !== lastRating) {
+        const sep = document.createElement("tr");
+        sep.className = "ginc-cap-sep";
+        const td = document.createElement("td");
+        td.colSpan = 4;
+        td.textContent = thisRating || "Unrated";
+        sep.appendChild(td);
+        tbody.appendChild(sep);
+        lastRating = thisRating;
+      }
+
+      const tr = document.createElement("tr");
+
+      // Country
+      const tdCountry = document.createElement("td");
+      tdCountry.innerHTML = buildCountryHTML(row, keys);
+      tr.appendChild(tdCountry);
+
+      // Rating
+      const tdRating = document.createElement("td");
+      tdRating.textContent = row[keys.ratingK] ?? "";
+      tr.appendChild(tdRating);
+
+      // Outlook
+      const tdOutlook = document.createElement("td");
+      tdOutlook.textContent = row[keys.outlookK] ?? "";
+      tr.appendChild(tdOutlook);
+
+      // Date
+      const tdDate = document.createElement("td");
+      tdDate.textContent = row[keys.dateK] ?? "";
+      tr.appendChild(tdDate);
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    mount.appendChild(table);
+  };
+
+  // --- Init per element ---
+  const initOne = async (el) => {
+    const pillar = (el.getAttribute("data-pillar") || "").trim();
+    const csvUrl = (el.getAttribute("data-src") || DEFAULT_CSV_URL).trim();
+
+    if (!pillar) {
+      renderError(el, "Missing required attribute: data-pillar.");
+      return;
+    }
+
+    try {
+      const res = await fetch(csvUrl, { mode: "cors", cache: "no-store" });
+      if (!res.ok) throw new Error(`Failed to fetch CSV (${res.status})`);
+      const text = await res.text();
+      const rows = parseCSV(text);
+      const objects = toObjects(rows);
+      if (!objects.length) {
+        renderError(el, "No data found in CSV.");
+        return;
+      }
+
+      // Column keys as per provided CSV headers
+      const sample   = objects[0];
+      const pillarK  = pickKey(sample, ["pillar"]);
+      const emojiK   = pickKey(sample, ["country_emoji"]);
+      const nameK    = pickKey(sample, ["country_name"]);
+      const slugK    = pickKey(sample, ["country_slug"]);
+      const ratingK  = pickKey(sample, ["rating"]);
+      const outlookK = pickKey(sample, ["outlook"]);
+      const dateK    = pickKey(sample, ["date"]);
+      const scoreK   = pickKey(sample, ["score"]);
+
+      if (!pillarK) return renderError(el, "CSV missing 'pillar' column.");
+      if (!nameK)   return renderError(el, "CSV missing 'country_name' column.");
+      if (!ratingK) return renderError(el, "CSV missing 'rating' column.");
+      if (!scoreK)  return renderError(el, "CSV missing 'score' column.");
+
+      // Filter by pillar
+      const filtered = objects.filter(o => ci(o[pillarK]) === ci(pillar));
+      if (!filtered.length) {
+        renderError(el, `No rows found for pillar: "${pillar}".`);
+        return;
+      }
+
+      // Sort by numeric 'score' descending
+      const ordered = [...filtered].sort((a, b) => {
+        const an = parseFloat(String(a[scoreK]).replace(/[^0-9.\-]/g, ""));
+        const bn = parseFloat(String(b[scoreK]).replace(/[^0-9.\-]/g, ""));
+        const av = Number.isFinite(an) ? an : -Infinity;
+        const bv = Number.isFinite(bn) ? bn : -Infinity;
+        return bv - av;
+      });
+
+      // Render table with rating separators
+      const keys = { emojiK, nameK, slugK, ratingK, outlookK, dateK };
+      renderTable(el, ordered, pillar, keys);
+
+    } catch (err) {
+      renderError(el, err.message || String(err));
+    }
+  };
+
+  // --- Boot ---
+  const init = () => {
+    injectStyles();
+    document.querySelectorAll(WIDGET_SELECTOR).forEach(initOne);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();

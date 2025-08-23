@@ -8,10 +8,9 @@
   const injectStyles = () => {
     if (document.getElementById("ginc-capability-table-styles")) return;
     const css = `
-      .ginc-cap-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-      .ginc-cap-table th, .ginc-cap-table td { padding: 8px 10px; vertical-align: top; }
+      .ginc-cap-table { width: 100%; border-collapse: collapse }
+      .ginc-cap-table th, .ginc-cap-table td { vertical-align: top; }
       .ginc-cap-table thead th { text-align: left; font-weight: 600; }
-      .ginc-cap-table-caption { margin: 6px 0 12px; color: #666; font-size: 0.9rem; }
       .ginc-cap-error { color: #b00020; }
       /* intentionally no borders or striping */
     `;
@@ -97,11 +96,6 @@
 
   const renderTable = (mount, rows, pillar, keys) => {
     mount.innerHTML = "";
-
-    const caption = document.createElement("div");
-    caption.className = "ginc-cap-table-caption";
-    caption.textContent = `${pillar} — ${rows.length} countries`;
-    mount.appendChild(caption);
 
     const table = document.createElement("table");
     table.className = "ginc-cap-table";

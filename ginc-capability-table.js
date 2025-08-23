@@ -1,21 +1,30 @@
+Here’s the updated ginc-capability-table.js (only the widget code, as requested).
+It renders a plain, borderless table with Country (emoji flag + space + country name), Rating, Outlook, Date, filters by the data-pillar, and orders rows by highest Score → lowest (Score is not rendered).
+
 (() => {
   const DEFAULT_CSV_URL = "https://ginc-org.github.io/public-national-capability-data/ginc-pillar-ratings.csv";
   const WIDGET_SELECTOR = '[data-widget="capability-table"]';
-  const PREFERRED_COLUMNS = ["Name", "Rating", "Outlook", "Date"]; // used if available
-  const HIDE_COLUMNS = ["Pillar"]; // usually internal filter
 
-  // Minimal, clean styles injected once
+  // Rating → fallback numeric score (if Score column missing)
+  const RATING_SCORE = {
+    "AAA": 20, "AA": 19, "A": 18,
+    "BBB": 17, "BB": 16, "B": 15,
+    "CCC": 14, "CC": 13, "C": 12,
+    "DDD": 11, "DD": 10, "D": 9,
+    "EEE": 8, "EE": 7, "E": 6,
+    "FFF": 5, "FF": 4, "F": 3,
+    "SP": 2, "LP": 1, "NP": 0
+  };
+
+  // Minimal, clean styles (plain table, no borders)
   const injectStyles = () => {
     if (document.getElementById("ginc-capability-table-styles")) return;
     const css = `
       .ginc-cap-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
       .ginc-cap-table th, .ginc-cap-table td { padding: 8px 10px; vertical-align: top; }
-      .ginc-cap-table thead th { text-align: left; font-weight: 600; cursor: pointer; user-select: none; }
-      .ginc-cap-table thead th[aria-sort="ascending"]::after { content: " ↑"; }
-      .ginc-cap-table thead th[aria-sort="descending"]::after { content: " ↓"; }
-      .ginc-cap-table tbody tr:nth-child(even) { background: rgba(0,0,0,0.03); }
-      .ginc-cap-table .ginc-cap-error { color: #b00020; }
-      .ginc-cap-table-caption { margin: 6px 0 16px; color: #666; font-size: 0.9rem; }
+      .ginc-cap-table thead th { text-align: left; font-weight: 600; }
+      .ginc-cap-table-caption { margin: 6px 0 12px; color: #666; font-size: 0.9rem; }
+      /* no borders, no zebra striping */
     `;
     const style = document.createElement("style");
     style.id = "ginc-capability-table-styles";
@@ -23,7 +32,7 @@
     document.head.appendChild(style);
   };
 
-  // Robust CSV parser (handles quotes, commas, newlines)
+  // Robust CSV parser (quotes, commas, newlines)
   const parseCSV = (csvText) => {
     const rows = [];
     let i = 0, field = "", row = [], inQuotes = false;
@@ -37,20 +46,17 @@
       if (inQuotes) {
         if (char === '"') {
           const next = csvText[i + 1];
-          if (next === '"') { field += '"'; i += 2; continue; } // escaped quote
+          if (next === '"') { field += '"'; i += 2; continue; }
           inQuotes = false; i++; continue;
-        } else {
-          field += char; i++; continue;
-        }
-      } else { // not in quotes
+        } else { field += char; i++; continue; }
+      } else {
         if (char === '"') { inQuotes = true; i++; continue; }
         if (char === ",") { pushField(); i++; continue; }
-        if (char === "\r") { i++; continue; } // ignore CR
+        if (char === "\r") { i++; continue; }
         if (char === "\n") { pushField(); pushRow(); i++; continue; }
         field += char; i++; continue;
       }
     }
-    // trailing field/row
     pushField();
     if (row.length > 1 || (row.length === 1 && row[0] !== "")) pushRow();
     return rows;
@@ -68,119 +74,128 @@
 
   const ci = (s = "") => s.trim().toLowerCase();
 
-  const pickColumns = (data, forcedList) => {
-    if (!data || data.length === 0) return [];
-    const allCols = Object.keys(data[0]);
+  // Helpers to find column keys by case-insensitive name
+  const pickKey = (obj, candidates) => {
+    const map = Object.keys(obj).reduce((acc, k) => { acc[ci(k)] = k; return acc; }, {});
+    for (const c of candidates) {
+      const k = map[ci(c)];
+      if (k) return k;
+    }
+    return null;
+  };
 
-    if (forcedList && forcedList.length) {
-      const want = forcedList.map(c => c.trim()).filter(Boolean);
-      const normalized = allCols.reduce((acc, c) => { acc[ci(c)] = c; return acc; }, {});
-      return want.map(w => normalized[ci(w)]).filter(Boolean);
+  // Emoji flag from ISO-2 code (e.g., "US" → 🇺🇸)
+  const iso2ToFlag = (code) => {
+    if (!code || code.length !== 2) return "";
+    const A = 127397; // 0x1F1E6 - 'A'
+    const cc = code.toUpperCase();
+    return String.fromCodePoint(cc.charCodeAt(0) + A, cc.charCodeAt(1) + A);
+  };
+
+  // Build "Country" cell: emoji flag + space + country name
+  const buildCountryCell = (row, keys) => {
+    const { nameK, countryK, flagK, iso2K } = keys;
+
+    const rawName = (row[nameK] ?? row[countryK] ?? "").trim();
+    const fromFlagCol = (flagK && row[flagK]) ? row[flagK].trim() : "";
+    const fromIso2 = (iso2K && row[iso2K]) ? iso2ToFlag(row[iso2K].trim()) : "";
+
+    // If the provided Name already starts with an emoji flag, respect it
+    const looksLikeFlag = rawName && /\p{RI}\p{RI}/u.test(rawName.slice(0, 4));
+    if (looksLikeFlag) return rawName;
+
+    const flag = fromFlagCol || fromIso2 || "";
+    return (flag ? `${flag} ` : "") + rawName;
+  };
+
+  // Determine numeric score for sorting: prefer Score column, else map Rating
+  const getNumericScore = (row, keys) => {
+    const { scoreK, ratingK } = keys;
+
+    // Try numeric Score
+    if (scoreK) {
+      const val = parseFloat((row[scoreK] || "").replace(/[^0-9.\-]/g, ""));
+      if (!Number.isNaN(val)) return val;
     }
 
-    // If preferred present, use them in order; else all minus HIDE_COLUMNS
-    const set = new Set(allCols.map(c => c));
-    const preferred = PREFERRED_COLUMNS.filter(pc => set.has(pc));
-    if (preferred.length) return preferred;
+    // Fallback to rating mapping
+    const r = (row[ratingK] || "").toUpperCase().trim();
+    if (r in RATING_SCORE) return RATING_SCORE[r];
 
-    return allCols.filter(c => !HIDE_COLUMNS.includes(c));
-  };
-
-  // Simple, stable sort
-  const sortData = (data, column, dir = "asc") => {
-    const multiplier = dir === "desc" ? -1 : 1;
-    return [...data].sort((a, b) => {
-      const av = a[column] ?? "";
-      const bv = b[column] ?? "";
-
-      // try numeric sort if both are numbers
-      const an = parseFloat(av.replace(/[^0-9.\-]/g, ""));
-      const bn = parseFloat(bv.replace(/[^0-9.\-]/g, ""));
-      const aNum = !isNaN(an) && av.match(/^\s*[\d\.\-]+/);
-      const bNum = !isNaN(bn) && bv.match(/^\s*[\d\.\-]+/);
-
-      if (aNum && bNum) return (an < bn ? -1 : an > bn ? 1 : 0) * multiplier;
-
-      // string compare
-      return av.localeCompare(bv, undefined, { sensitivity: "base", numeric: true }) * multiplier;
-    });
-  };
-
-  const renderTable = (mount, data, columns, titleText) => {
-    mount.innerHTML = "";
-
-    const caption = document.createElement("div");
-    caption.className = "ginc-cap-table-caption";
-    caption.textContent = titleText;
-    mount.appendChild(caption);
-
-    const table = document.createElement("table");
-    table.className = "ginc-cap-table";
-
-    const thead = document.createElement("thead");
-    const trHead = document.createElement("tr");
-    columns.forEach(col => {
-      const th = document.createElement("th");
-      th.textContent = col;
-      th.setAttribute("role", "columnheader");
-      th.dataset.col = col;
-      trHead.appendChild(th);
-    });
-    thead.appendChild(trHead);
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-    const drawBody = (rows) => {
-      tbody.innerHTML = "";
-      rows.forEach(row => {
-        const tr = document.createElement("tr");
-        columns.forEach(col => {
-          const td = document.createElement("td");
-          td.innerHTML = sanitizeCell(row[col]);
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-    };
-    drawBody(data);
-    table.appendChild(tbody);
-    mount.appendChild(table);
-
-    // Sorting handlers
-    let sortState = { col: null, dir: "asc" };
-    trHead.querySelectorAll("th").forEach(th => {
-      th.addEventListener("click", () => {
-        const col = th.dataset.col;
-        let dir = "asc";
-        if (sortState.col === col) dir = sortState.dir === "asc" ? "desc" : "asc";
-        sortState = { col, dir };
-        trHead.querySelectorAll("th").forEach(h => h.removeAttribute("aria-sort"));
-        th.setAttribute("aria-sort", dir === "asc" ? "ascending" : "descending");
-        drawBody(sortData(data, col, dir));
-      });
-    });
-  };
-
-  const sanitizeCell = (val) => {
-    // allow simple links/flags already embedded; otherwise escape basic HTML characters
-    if (/[<>]/.test(val)) return val; // trust CSV if it intentionally includes markup (e.g., emoji flags or anchors)
-    return String(val)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;");
+    // Final fallback: 0
+    return 0;
   };
 
   const renderError = (mount, message) => {
     mount.innerHTML = `<div class="ginc-cap-table ginc-cap-error">Error: ${message}</div>`;
   };
 
+  const renderTable = (mount, rows, pillar, keys) => {
+    mount.innerHTML = "";
+
+    // Caption
+    const caption = document.createElement("div");
+    caption.className = "ginc-cap-table-caption";
+    caption.textContent = `${pillar} — ${rows.length} countries`;
+    mount.appendChild(caption);
+
+    // Table
+    const table = document.createElement("table");
+    table.className = "ginc-cap-table";
+
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
+    ["Country", "Rating", "Outlook", "Date"].forEach(col => {
+      const th = document.createElement("th");
+      th.textContent = col;
+      trHead.appendChild(th);
+    });
+    thead.appendChild(trHead);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    rows.forEach(row => {
+      const tr = document.createElement("tr");
+
+      // Country (emoji flag + space + country name)
+      const tdCountry = document.createElement("td");
+      tdCountry.textContent = ""; // reset
+      tdCountry.innerHTML = sanitizeCell(buildCountryCell(row, keys));
+      tr.appendChild(tdCountry);
+
+      // Rating
+      const tdRating = document.createElement("td");
+      tdRating.textContent = row[keys.ratingK] ?? "";
+      tr.appendChild(tdRating);
+
+      // Outlook
+      const tdOutlook = document.createElement("td");
+      tdOutlook.textContent = row[keys.outlookK] ?? "";
+      tr.appendChild(tdOutlook);
+
+      // Date
+      const tdDate = document.createElement("td");
+      tdDate.textContent = row[keys.dateK] ?? "";
+      tr.appendChild(tdDate);
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    mount.appendChild(table);
+  };
+
+  const sanitizeCell = (val) => {
+    if (/[<>]/.test(val)) return val; // trust if CSV intentionally includes markup
+    return String(val)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  };
+
   const initOne = async (el) => {
     const pillar = (el.getAttribute("data-pillar") || "").trim();
     const csvUrl = (el.getAttribute("data-src") || DEFAULT_CSV_URL).trim();
-    const requestedColumns = (el.getAttribute("data-columns") || "")
-      .split(",")
-      .map(s => s.trim())
-      .filter(Boolean);
 
     if (!pillar) {
       renderError(el, "Missing required attribute: data-pillar.");
@@ -193,28 +208,55 @@
       const text = await res.text();
       const rows = parseCSV(text);
       const objects = toObjects(rows);
-
       if (!objects.length) {
         renderError(el, "No data found in CSV.");
         return;
       }
 
-      // Find pillar column (case-insensitive)
-      const pillarKey = Object.keys(objects[0]).find(k => ci(k) === "pillar");
-      if (!pillarKey) {
+      // Identify column keys
+      const sample = objects[0];
+      const pillarK  = pickKey(sample, ["Pillar"]);
+      if (!pillarK) {
         renderError(el, "CSV missing 'Pillar' column required for filtering.");
         return;
       }
 
-      // Filter by pillar (case-insensitive equality)
-      const filtered = objects.filter(o => ci(o[pillarKey]) === ci(pillar));
+      const nameK    = pickKey(sample, ["Name", "Country", "Country Name"]);
+      const countryK = pickKey(sample, ["Country", "Country Name"]);
+      const ratingK  = pickKey(sample, ["Rating"]);
+      const outlookK = pickKey(sample, ["Outlook"]);
+      const dateK    = pickKey(sample, ["Date", "Updated", "As Of"]);
+      const scoreK   = pickKey(sample, ["Score", "Numeric Score", "Value"]); // optional
+      const flagK    = pickKey(sample, ["Flag", "Emoji"]);
+      const iso2K    = pickKey(sample, ["ISO2", "Alpha-2", "Code"]);
+
+      if (!nameK && !countryK) {
+        renderError(el, "CSV needs a 'Name' or 'Country' column.");
+        return;
+      }
+      if (!ratingK) {
+        renderError(el, "CSV missing 'Rating' column.");
+        return;
+      }
+
+      // Filter by pillar
+      const filtered = objects.filter(o => ci(o[pillarK]) === ci(pillar));
       if (!filtered.length) {
         renderError(el, `No rows found for pillar: "${pillar}".`);
         return;
       }
 
-      const columns = pickColumns(filtered, requestedColumns);
-      renderTable(el, filtered, columns, `${pillar} — ${filtered.length} countries`);
+      // Sort by Score desc (fallback to Rating mapping)
+      const keys = { nameK, countryK, ratingK, outlookK, dateK, scoreK, flagK, iso2K };
+      const ordered = [...filtered].sort((a, b) => {
+        const as = getNumericScore(a, keys);
+        const bs = getNumericScore(b, keys);
+        return bs - as; // descending
+      });
+
+      // Render table with fixed columns (Country, Rating, Outlook, Date)
+      renderTable(el, ordered, pillar, keys);
+
     } catch (err) {
       renderError(el, err.message || String(err));
     }
@@ -222,8 +264,7 @@
 
   const init = () => {
     injectStyles();
-    const nodes = document.querySelectorAll(WIDGET_SELECTOR);
-    nodes.forEach(initOne);
+    document.querySelectorAll(WIDGET_SELECTOR).forEach(initOne);
   };
 
   if (document.readyState === "loading") {

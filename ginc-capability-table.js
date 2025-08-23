@@ -4,15 +4,17 @@
   const WIDGET_SELECTOR = '[data-widget="capability-table"]';
   const BASE_COUNTRY_URL = "https://www.ginc.org/";
 
-  // --- Styles: plain table, no borders ---
+  // --- Styles: plain table, no borders; add subtle rating separators ---
   const injectStyles = () => {
     if (document.getElementById("ginc-capability-table-styles")) return;
     const css = `
-      .ginc-cap-table { width: 100%; border-collapse: collapse }
-      .ginc-cap-table th, .ginc-cap-table td { vertical-align: top; }
+      .ginc-cap-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+      .ginc-cap-table th, .ginc-cap-table td { padding: 8px 10px; vertical-align: top; }
       .ginc-cap-table thead th { text-align: left; font-weight: 600; }
+      .ginc-cap-table-caption { margin: 6px 0 12px; color: #666; font-size: 0.9rem; }
       .ginc-cap-error { color: #b00020; }
-      /* intentionally no borders or striping */
+      .ginc-cap-sep td { padding: 10px 10px 6px; font-weight: 700; color: #333; }
+      /* intentionally no borders or zebra striping */
     `;
     const style = document.createElement("style");
     style.id = "ginc-capability-table-styles";
@@ -34,13 +36,13 @@
       if (inQuotes) {
         if (char === '"') {
           const next = csvText[i + 1];
-          if (next === '"') { field += '"'; i += 2; continue; } // escaped quote
+          if (next === '"') { field += '"'; i += 2; continue; }
           inQuotes = false; i++; continue;
         } else { field += char; i++; continue; }
       } else {
         if (char === '"') { inQuotes = true; i++; continue; }
         if (char === ",") { pushField(); i++; continue; }
-        if (char === "\r") { i++; continue; } // ignore CR
+        if (char === "\r") { i++; continue; }
         if (char === "\n") { pushField(); pushRow(); i++; continue; }
         field += char; i++; continue;
       }
@@ -83,6 +85,7 @@
     const slug  = (row[k.slugK]  || "").trim().replace(/^\/+/, "");
     const flagPart = emoji ? `${escapeHTML(emoji)} ` : "";
     if (slug) {
+      // Note: slug is appended as-is (encoded) after BASE_COUNTRY_URL
       const url = BASE_COUNTRY_URL + encodeURIComponent(slug);
       return `${flagPart}<a href="${url}">${escapeHTML(name)}</a>`;
     }
@@ -96,6 +99,11 @@
 
   const renderTable = (mount, rows, pillar, keys) => {
     mount.innerHTML = "";
+
+    const caption = document.createElement("div");
+    caption.className = "ginc-cap-table-caption";
+    caption.textContent = `${pillar} — ${rows.length} countries`;
+    mount.appendChild(caption);
 
     const table = document.createElement("table");
     table.className = "ginc-cap-table";
@@ -111,12 +119,27 @@
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
+
+    // Insert a rating separator row whenever Rating changes while iterating sorted rows
+    let lastRating = null;
     rows.forEach(row => {
+      const thisRating = (row[keys.ratingK] || "").trim();
+      if (thisRating !== lastRating) {
+        const sep = document.createElement("tr");
+        sep.className = "ginc-cap-sep";
+        const td = document.createElement("td");
+        td.colSpan = 4;
+        td.textContent = thisRating || "Unrated";
+        sep.appendChild(td);
+        tbody.appendChild(sep);
+        lastRating = thisRating;
+      }
+
       const tr = document.createElement("tr");
 
       // Country
       const tdCountry = document.createElement("td");
-      tdCountry.innerHTML = buildCountryHTML(row, keys); // safe: we escape pieces above
+      tdCountry.innerHTML = buildCountryHTML(row, keys);
       tr.appendChild(tdCountry);
 
       // Rating
@@ -164,7 +187,7 @@
 
       // Column keys as per provided CSV headers
       const sample   = objects[0];
-      const pillarK  = pickKey(sample, ["pillar", "Pillar"]);
+      const pillarK  = pickKey(sample, ["pillar"]);
       const emojiK   = pickKey(sample, ["country_emoji"]);
       const nameK    = pickKey(sample, ["country_name"]);
       const slugK    = pickKey(sample, ["country_slug"]);
@@ -194,7 +217,7 @@
         return bv - av;
       });
 
-      // Render table
+      // Render table with rating separators
       const keys = { emojiK, nameK, slugK, ratingK, outlookK, dateK };
       renderTable(el, ordered, pillar, keys);
 

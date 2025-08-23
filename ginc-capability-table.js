@@ -1,6 +1,3 @@
-Here’s the updated ginc-capability-table.js (only the widget code, as requested).
-It renders a plain, borderless table with Country (emoji flag + space + country name), Rating, Outlook, Date, filters by the data-pillar, and orders rows by highest Score → lowest (Score is not rendered).
-
 (() => {
   const DEFAULT_CSV_URL = "https://ginc-org.github.io/public-national-capability-data/ginc-pillar-ratings.csv";
   const WIDGET_SELECTOR = '[data-widget="capability-table"]';

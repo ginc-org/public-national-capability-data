@@ -1,3 +1,4 @@
+// ginc-capability-table.js
 (() => {
   const DEFAULT_CSV_URL = "https://ginc-org.github.io/public-national-capability-data/ginc-pillar-ratings.csv";
   const WIDGET_SELECTOR = '[data-widget="capability-table"]';
@@ -21,7 +22,8 @@
       .ginc-cap-table th, .ginc-cap-table td { padding: 8px 10px; vertical-align: top; }
       .ginc-cap-table thead th { text-align: left; font-weight: 600; }
       .ginc-cap-table-caption { margin: 6px 0 12px; color: #666; font-size: 0.9rem; }
-      /* no borders, no zebra striping */
+      .ginc-cap-error { color: #b00020; }
+      /* intentionally no borders or zebra striping */
     `;
     const style = document.createElement("style");
     style.id = "ginc-capability-table-styles";
@@ -29,7 +31,7 @@
     document.head.appendChild(style);
   };
 
-  // Robust CSV parser (quotes, commas, newlines)
+  // Robust CSV parser (handles quotes, commas, newlines)
   const parseCSV = (csvText) => {
     const rows = [];
     let i = 0, field = "", row = [], inQuotes = false;
@@ -43,17 +45,20 @@
       if (inQuotes) {
         if (char === '"') {
           const next = csvText[i + 1];
-          if (next === '"') { field += '"'; i += 2; continue; }
+          if (next === '"') { field += '"'; i += 2; continue; } // escaped quote
           inQuotes = false; i++; continue;
-        } else { field += char; i++; continue; }
+        } else {
+          field += char; i++; continue;
+        }
       } else {
         if (char === '"') { inQuotes = true; i++; continue; }
         if (char === ",") { pushField(); i++; continue; }
-        if (char === "\r") { i++; continue; }
+        if (char === "\r") { i++; continue; } // ignore CR
         if (char === "\n") { pushField(); pushRow(); i++; continue; }
         field += char; i++; continue;
       }
     }
+    // trailing field/row
     pushField();
     if (row.length > 1 || (row.length === 1 && row[0] !== "")) pushRow();
     return rows;
@@ -89,20 +94,35 @@
     return String.fromCodePoint(cc.charCodeAt(0) + A, cc.charCodeAt(1) + A);
   };
 
+  // Detect & strip leading emoji flag (regional indicator pair) from a string
+  const stripLeadingFlag = (s) => {
+    if (!s) return { flag: "", name: "" };
+    const str = s.trim();
+    // Two Regional Indicator Symbols in a row
+    const flagMatch = str.match(/^\p{RI}\p{RI}\s*/u);
+    if (flagMatch) {
+      const flag = flagMatch[0].trim();
+      const name = str.slice(flagMatch[0].length).trim();
+      return { flag, name };
+    }
+    return { flag: "", name: str };
+  };
+
   // Build "Country" cell: emoji flag + space + country name
   const buildCountryCell = (row, keys) => {
-    const { nameK, countryK, flagK, iso2K } = keys;
+    const { nameK, countryK, emojiK, iso2K } = keys;
 
-    const rawName = (row[nameK] ?? row[countryK] ?? "").trim();
-    const fromFlagCol = (flagK && row[flagK]) ? row[flagK].trim() : "";
+    // Prefer Name, else Country
+    const raw = (row[nameK] ?? row[countryK] ?? "").trim();
+    const { flag: existingFlag, name: cleanName } = stripLeadingFlag(raw);
+
+    const fromEmojiCol = (emojiK && row[emojiK]) ? row[emojiK].trim() : "";
     const fromIso2 = (iso2K && row[iso2K]) ? iso2ToFlag(row[iso2K].trim()) : "";
 
-    // If the provided Name already starts with an emoji flag, respect it
-    const looksLikeFlag = rawName && /\p{RI}\p{RI}/u.test(rawName.slice(0, 4));
-    if (looksLikeFlag) return rawName;
+    // Choose flag: keep existing if present in Name, else Emoji column, else ISO2-derived
+    const flag = existingFlag || fromEmojiCol || fromIso2 || "";
 
-    const flag = fromFlagCol || fromIso2 || "";
-    return (flag ? `${flag} ` : "") + rawName;
+    return (flag ? `${flag} ` : "") + cleanName;
   };
 
   // Determine numeric score for sorting: prefer Score column, else map Rating
@@ -121,6 +141,14 @@
 
     // Final fallback: 0
     return 0;
+  };
+
+  const sanitizeCell = (val) => {
+    if (/[<>]/.test(val)) return val; // trust CSV if markup intentionally included
+    return String(val)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
   };
 
   const renderError = (mount, message) => {
@@ -156,7 +184,6 @@
 
       // Country (emoji flag + space + country name)
       const tdCountry = document.createElement("td");
-      tdCountry.textContent = ""; // reset
       tdCountry.innerHTML = sanitizeCell(buildCountryCell(row, keys));
       tr.appendChild(tdCountry);
 
@@ -182,14 +209,6 @@
     mount.appendChild(table);
   };
 
-  const sanitizeCell = (val) => {
-    if (/[<>]/.test(val)) return val; // trust if CSV intentionally includes markup
-    return String(val)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;");
-  };
-
   const initOne = async (el) => {
     const pillar = (el.getAttribute("data-pillar") || "").trim();
     const csvUrl = (el.getAttribute("data-src") || DEFAULT_CSV_URL).trim();
@@ -210,7 +229,7 @@
         return;
       }
 
-      // Identify column keys
+      // Identify column keys (CSV guide: Pillar, Name, Rating, Outlook, Date, Score, ISO2/Emoji optional)
       const sample = objects[0];
       const pillarK  = pickKey(sample, ["Pillar"]);
       if (!pillarK) {
@@ -224,7 +243,7 @@
       const outlookK = pickKey(sample, ["Outlook"]);
       const dateK    = pickKey(sample, ["Date", "Updated", "As Of"]);
       const scoreK   = pickKey(sample, ["Score", "Numeric Score", "Value"]); // optional
-      const flagK    = pickKey(sample, ["Flag", "Emoji"]);
+      const emojiK   = pickKey(sample, ["Emoji", "Flag"]);
       const iso2K    = pickKey(sample, ["ISO2", "Alpha-2", "Code"]);
 
       if (!nameK && !countryK) {
@@ -236,22 +255,22 @@
         return;
       }
 
-      // Filter by pillar
+      // Filter by pillar (case-insensitive)
       const filtered = objects.filter(o => ci(o[pillarK]) === ci(pillar));
       if (!filtered.length) {
         renderError(el, `No rows found for pillar: "${pillar}".`);
         return;
       }
 
-      // Sort by Score desc (fallback to Rating mapping)
-      const keys = { nameK, countryK, ratingK, outlookK, dateK, scoreK, flagK, iso2K };
+      // Sort by Score desc (fallback to Rating mapping), do not render Score
+      const keys = { nameK, countryK, ratingK, outlookK, dateK, scoreK, emojiK, iso2K };
       const ordered = [...filtered].sort((a, b) => {
         const as = getNumericScore(a, keys);
         const bs = getNumericScore(b, keys);
         return bs - as; // descending
       });
 
-      // Render table with fixed columns (Country, Rating, Outlook, Date)
+      // Render plain, borderless table with fixed columns
       renderTable(el, ordered, pillar, keys);
 
     } catch (err) {

@@ -10,11 +10,11 @@
     const css = `
       .ginc-cap-table { width: 100%; border-collapse: collapse; font-size: 1.5rem; }
       .ginc-cap-table th, .ginc-cap-table td { padding: 6px 10px; vertical-align: top; }
-      .ginc-cap-table thead th { text-align: left; font-weight: 600; }
+      .ginc-cap-table thead th { text-align: left; font-weight: 600; text-transform: uppercase;}
       .ginc-cap-error { color: #b00020; }
       .ginc-cap-sep td {
-        padding: 10px 10px 6px;
-        font-weight: 700;
+        padding: 6px 10px;
+        font-weight: 600;
         color: #333;
         background: #f5f5f5; /* light grey background */
       }

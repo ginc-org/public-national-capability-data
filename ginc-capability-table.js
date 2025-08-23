@@ -5,8 +5,8 @@
   const BASE_COUNTRY_URL = "https://www.ginc.org/";
 
   // --- Styles: plain table, no borders ---
-  const injectStyles = () => {
-    if (document.getElementById("ginc-capability-table-styles")) return;
+  //const injectStyles = () => {
+    //if (document.getElementById("ginc-capability-table-styles")) return;
     //const css = `
     //  .ginc-cap-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
     //  .ginc-cap-table th, .ginc-cap-table td { padding: 8px 10px; vertical-align: top; }
@@ -15,11 +15,11 @@
     //  .ginc-cap-error { color: #b00020; }
     //  /* intentionally no borders or striping */
     //`;
-    const style = document.createElement("style");
-    style.id = "ginc-capability-table-styles";
-    style.textContent = css;
-    document.head.appendChild(style);
-  };
+  //  const style = document.createElement("style");
+  //  style.id = "ginc-capability-table-styles";
+  //  style.textContent = css;
+  //  document.head.appendChild(style);
+  //};
 
   // --- CSV parsing (robust for quotes/commas/newlines) ---
   const parseCSV = (csvText) => {

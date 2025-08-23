@@ -7,14 +7,14 @@
   // --- Styles: plain table, no borders ---
   const injectStyles = () => {
     if (document.getElementById("ginc-capability-table-styles")) return;
-    const css = `
-      .ginc-cap-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-      .ginc-cap-table th, .ginc-cap-table td { padding: 8px 10px; vertical-align: top; }
-      .ginc-cap-table thead th { text-align: left; font-weight: 600; }
-      .ginc-cap-table-caption { margin: 6px 0 12px; color: #666; font-size: 0.9rem; }
-      .ginc-cap-error { color: #b00020; }
-      /* intentionally no borders or striping */
-    `;
+    //const css = `
+    //  .ginc-cap-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    //  .ginc-cap-table th, .ginc-cap-table td { padding: 8px 10px; vertical-align: top; }
+    //  .ginc-cap-table thead th { text-align: left; font-weight: 600; }
+    //  .ginc-cap-table-caption { margin: 6px 0 12px; color: #666; font-size: 0.9rem; }
+    //  .ginc-cap-error { color: #b00020; }
+    //  /* intentionally no borders or striping */
+    //`;
     const style = document.createElement("style");
     style.id = "ginc-capability-table-styles";
     style.textContent = css;

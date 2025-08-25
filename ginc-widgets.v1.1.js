@@ -217,44 +217,58 @@
     };
   }
 
-  // ====== Ratings index (keys on *_var) ======
-  function buildRatingsIndex(ratings) {
-    if (!ratings.length) return { by: { domain:new Map(), subdomain:new Map(), pillar:new Map() }, keys:{} };
+// ====== Ratings index (prefers 'assessment_type'; falls back to inference) ======
+function buildRatingsIndex(ratings) {
+  if (!ratings.length) return { by: { domain:new Map(), subdomain:new Map(), pillar:new Map() }, keys:{} };
 
-    const s = ratings[0];
-    const isoK     = pickKey(s, ["iso3","iso_a3","iso_alpha3","iso","alpha3","country_iso"]); // accept country_iso too
-    const assessK  = pickKey(s, ["assessment","level","type"]);
-    const domainVarK = pickKey(s, ["domain_var","domain_key"]);
-    const subVarK    = pickKey(s, ["subdomain_var","subdomain_key"]);
-    const pillarVarK = pickKey(s, ["pillar_var","pillar_key","component_var"]);
-    const ratingK  = pickKey(s, ["rating"]);
-    const scoreK   = pickKey(s, ["score","value","points"]);
-    const outlookK = pickKey(s, ["outlook"]);
-    const dateK    = pickKey(s, ["date","asof","as_at","as-of"]);
+  const s = ratings[0];
 
-    if (!isoK || !assessK) throw new Error("ginc-ratings.csv missing ISO or assessment columns.");
-    if (!ratingK || !scoreK) throw new Error("ginc-ratings.csv missing rating/score columns.");
+  // ISO: your file uses country_iso (keep broad fallbacks for safety)
+  const isoK        = pickKey(s, ["country_iso","iso3","iso_a3","iso_alpha3","iso","alpha3"]);
 
-    const by = { domain:new Map(), subdomain:new Map(), pillar:new Map() };
+  // NEW: prefer 'assessment_type' (domain|subdomain|pillar)
+  const assessK     = pickKey(s, ["assessment_type","assessment","assessment_level","level","type"]);
 
-    const idFor = (level, row) => {
-      if (level === "domain")    return ci(row[domainVarK] || "");
-      if (level === "subdomain") return ci(row[subVarK]    || "");
-      if (level === "pillar")    return ci(row[pillarVarK] || "");
-      return "";
-    };
+  // Prefer *_var; keep fallbacks so older extracts still work
+  const domainVarK  = pickKey(s, ["domain_var","domain_key","domain","domain_url"]);
+  const subVarK     = pickKey(s, ["subdomain_var","subdomain_key","subdomain","subdomain_url"]);
+  const pillarVarK  = pickKey(s, ["pillar_var","pillar_key","pillar","pillar_url","component","component_var"]);
 
-    ratings.forEach(r => {
-      const iso = (r[isoK]||"").trim().toUpperCase();
-      const level = ci(r[assessK]||"");
-      if (!iso || !by[level]) return;
-      const id = idFor(level, r);
-      if (!id) return;
-      by[level].set(`${iso}|${id}`, r);
-    });
+  const ratingK     = pickKey(s, ["rating"]);
+  const scoreK      = pickKey(s, ["score","value","points"]);
+  const outlookK    = pickKey(s, ["outlook"]);
+  const dateK       = pickKey(s, ["date","asof","as_at","as-of"]);
 
-    return { by, keys:{ isoK, assessK, domainVarK, subVarK, pillarVarK, ratingK, scoreK, outlookK, dateK } };
-  }
+  if (!isoK) throw new Error("ginc-ratings.csv missing ISO column (expected 'country_iso' or equivalent).");
+  if (!ratingK || !scoreK) throw new Error("ginc-ratings.csv missing rating/score columns.");
+
+  const by = { domain:new Map(), subdomain:new Map(), pillar:new Map() };
+
+  ratings.forEach(r => {
+    const iso = (r[isoK] || "").trim().toUpperCase();
+    if (!iso) return;
+
+    // Use assessment_type when present; otherwise infer from populated *_var
+    let level = assessK ? ci(r[assessK] || "") : "";
+    if (!by[level]) {
+      level =
+        (r[pillarVarK]  && r[pillarVarK].trim()) ? "pillar" :
+        (r[subVarK]     && r[subVarK].trim())    ? "subdomain" :
+        (r[domainVarK]  && r[domainVarK].trim()) ? "domain" : "";
+    }
+    if (!by[level]) return;
+
+    const id =
+      level === "pillar"    ? ci(r[pillarVarK]  || "") :
+      level === "subdomain" ? ci(r[subVarK]     || "") :
+      level === "domain"    ? ci(r[domainVarK]  || "") : "";
+
+    if (!id) return;
+    by[level].set(`${iso}|${id}`, r);
+  });
+
+  return { by, keys:{ isoK, assessK, domainVarK, subVarK, pillarVarK, ratingK, scoreK, outlookK, dateK } };
+}
 
   // ====== Filtering (maps to region / sub_region / groups) ======
   function countryPassesFilters(geoRow, geoKeys, filters) {

@@ -1,4 +1,4 @@
-domain_var,subdomain_var,pillar_var,country_iso,assessment,score,rating,date,outlook
+domain_var,subdomain_var,pillar_var,country_iso,assessment_type,score,rating,date,outlook
 hard-power,national-security,cyber-capability,ABW,pillar,11,DDD,Aug 2025,Stable
 hard-power,national-security,cyber-capability,AFG,pillar,0,NP,Aug 2025,Neutral
 hard-power,national-security,cyber-capability,AGO,pillar,7,EE,Aug 2025,Stable

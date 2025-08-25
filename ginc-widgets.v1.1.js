@@ -5,7 +5,7 @@
   const GEO_URL       = "https://ginc-org.github.io/public-national-capability-data/ginc-geo.csv";
 
   const WIDGET_SELECTOR = '[data-widget="ginc-capability-table"]';
-  const BASE_COUNTRY_URL = "https://www.ginc.org/"; // + country_slug
+  const BASE_COUNTRY_URL = "https://www.ginc.org/"; // + country_url (relative)
 
   // ====== Styles ======
   function injectStyles() {
@@ -87,10 +87,10 @@
   const buildCountryHTML = (geoRow, keys) => {
     const emoji = (geoRow[keys.emojiK] || "").trim();
     const name  = (geoRow[keys.nameK]  || "").trim();
-    const slug  = (geoRow[keys.slugK]  || "").trim().replace(/^\/+/, "");
+    const rel   = (geoRow[keys.urlK]   || "").trim().replace(/^\//, ""); // relative path (no leading slash)
     const flag  = emoji ? `${escapeHTML(emoji)} ` : "";
-    if (slug) {
-      const url = BASE_COUNTRY_URL + encodeURIComponent(slug);
+    if (rel) {
+      const url = encodeURI(BASE_COUNTRY_URL + rel);
       return `${flag}<a href="${url}">${escapeHTML(name)}</a>`;
     }
     return `${flag}${escapeHTML(name)}`;
@@ -106,33 +106,35 @@
     return toObjects(parseCSV(txt));
   }
 
-  // ====== GEO index ======
+  // ====== GEO index (uses exact headers you provided) ======
   function buildGeoIndex(geo) {
     if (!geo.length) return { byIso:{}, list:[], keys:{} };
     const s = geo[0];
-    const isoK   = pickKey(s, ["iso3","iso_a3","iso_alpha3","iso","alpha3"]);
+
+    // Exact columns from ginc-geo.csv (with light fallbacks)
+    const isoK   = pickKey(s, ["country_iso","iso3","iso_a3","iso_alpha3","iso","alpha3"]);
     const nameK  = pickKey(s, ["country_name","name","country"]);
     const emojiK = pickKey(s, ["country_emoji","emoji"]);
-    const slugK  = pickKey(s, ["country_slug","slug","path"]);
+    const urlK   = pickKey(s, ["country_url","path","url"]);   // NOTE: not country_slug
     const regionK    = pickKey(s, ["region"]);
-    const subregionK = pickKey(s, ["subregion","sub_region"]);
-    const groupK     = pickKey(s, ["group","groups","memberships","membership"]);
-    if (!isoK || !nameK) throw new Error("ginc-geo.csv missing ISO or country name keys.");
+    const subregionK = pickKey(s, ["sub_region","subregion","sub-region"]);
+    const groupK     = pickKey(s, ["groups","group","memberships","membership"]);
+
+    if (!isoK || !nameK) throw new Error("ginc-geo.csv missing country_iso or country_name.");
     const byIso = {};
     geo.forEach(r => {
       const iso = (r[isoK]||"").trim().toUpperCase();
       if (!iso) return;
       byIso[iso] = r;
     });
-    return { byIso, list: geo, keys:{ isoK,nameK,emojiK,slugK,regionK,subregionK,groupK } };
+    return { byIso, list: geo, keys:{ isoK,nameK,emojiK,urlK,regionK,subregionK,groupK } };
   }
 
-  // ====== Framework hierarchy (corrected keys) ======
+  // ====== Framework hierarchy (correct keys: *_name, *_url, *_var) ======
   function buildFrameworkHierarchy(fw) {
     if (!fw.length) return { domains: [], keys:{} };
     const s = fw[0];
 
-    // CORRECTED: use *_name, *_url, *_var (with fallbacks & derivation)
     const domainNameK = pickKey(s, ["domain_name"]);
     const domainUrlK  = pickKey(s, ["domain_url"]);
     let   domainVarK  = pickKey(s, ["domain_var"]);
@@ -149,7 +151,6 @@
     const pillarOrderK= pickKey(s, ["pillar_order","order_pillar","pillar_sort","order"]);
     const pillarColorK= pickKey(s, ["pillar_color","color","hex","colour","color_hex","colour_hex"]);
 
-    // soft guards: derive *_var when absent
     const getVar = (row, varK, urlK, nameK) => {
       if (varK && row[varK]) return ci(row[varK]);
       if (urlK && row[urlK]) return toSlug(row[urlK]);
@@ -157,7 +158,6 @@
       return "";
     };
 
-    // Build Domains -> Subdomains -> Pillars
     const domainMap = new Map();
     fw.forEach(r => {
       const dVar = getVar(r, domainVarK, domainUrlK, domainNameK);
@@ -176,7 +176,7 @@
       const sdKey = sdVar || `__no_sub__:${d.subdomains.size}`;
       if (!d.subdomains.has(sdKey)) {
         d.subdomains.set(sdKey, {
-          slug: sdVar, // may be empty
+          slug: sdVar,
           name: sdVar ? (r[subNameK] || titleize(sdVar)) : "",
           order: safeNum(r[subOrderK]),
           pillars: []
@@ -194,7 +194,6 @@
       });
     });
 
-    // Sort by provided order columns (fallback: insertion)
     const domains = Array.from(domainMap.values())
       .sort((a,b) => (isNaN(a.order)?Infinity:a.order) - (isNaN(b.order)?Infinity:b.order))
       .map(d => {
@@ -218,14 +217,13 @@
     };
   }
 
-  // ====== Ratings index (prefer *_var) ======
+  // ====== Ratings index (keys on *_var) ======
   function buildRatingsIndex(ratings) {
     if (!ratings.length) return { by: { domain:new Map(), subdomain:new Map(), pillar:new Map() }, keys:{} };
 
     const s = ratings[0];
-    const isoK     = pickKey(s, ["iso3","iso_a3","iso_alpha3","iso","alpha3"]);
+    const isoK     = pickKey(s, ["iso3","iso_a3","iso_alpha3","iso","alpha3","country_iso"]); // accept country_iso too
     const assessK  = pickKey(s, ["assessment","level","type"]);
-    // CORRECTED: prefer *_var columns
     const domainVarK = pickKey(s, ["domain_var","domain_key"]);
     const subVarK    = pickKey(s, ["subdomain_var","subdomain_key"]);
     const pillarVarK = pickKey(s, ["pillar_var","pillar_key","component_var"]);
@@ -258,10 +256,11 @@
     return { by, keys:{ isoK, assessK, domainVarK, subVarK, pillarVarK, ratingK, scoreK, outlookK, dateK } };
   }
 
-  // ====== Filtering ======
+  // ====== Filtering (maps to region / sub_region / groups) ======
   function countryPassesFilters(geoRow, geoKeys, filters) {
     if (!geoRow) return false;
     const { region, subregion, group } = filters;
+
     if (region) {
       const r = geoKeys.regionK ? ci(geoRow[geoKeys.regionK]||"") : "";
       if (ci(region) !== r) return false;
@@ -362,7 +361,6 @@
   }
 
   function renderOverallTable(mount, fw, ratingsIdx, geoIdx, filters) {
-    // Match the three domain VARs (expecting "hard-power", "soft-power", "economic-power")
     const ensureDomain = (slug, fallbackName) => {
       const found = fw.domains.find(d => ci(d.slug)===ci(slug));
       return found || { slug, name: fallbackName || titleize(slug) };

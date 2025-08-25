@@ -66,6 +66,7 @@
 
   // ====== Utils ======
   const ci = (s="") => s.trim().toLowerCase();
+  const slug = (s="") => ci(s).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
   const safeNum = (v) => {
     const n = parseFloat(String(v).replace(/[^0-9.\-]/g,""));
     return Number.isFinite(n) ? n : NaN;
@@ -79,15 +80,15 @@
     }
     return null;
   };
-  const titleize = (slug="") => slug.split(/[-_ ]+/).map(w=>w? w[0].toUpperCase()+w.slice(1): "").join(" ");
-  const toSlug = (s="") => ci(s).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  const titleize = (s="") => s.split(/[-_ ]+/).map(w=>w? w[0].toUpperCase()+w.slice(1): "").join(" ");
   const escapeHTML = (v) => String(v)
     .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+  const parseWhen = (v) => { const t = Date.parse(v || ""); return Number.isNaN(t) ? NaN : t; };
 
   const buildCountryHTML = (geoRow, keys) => {
     const emoji = (geoRow[keys.emojiK] || "").trim();
     const name  = (geoRow[keys.nameK]  || "").trim();
-    const rel   = (geoRow[keys.urlK]   || "").trim().replace(/^\//, ""); // relative path (no leading slash)
+    const rel   = (geoRow[keys.urlK]   || "").trim().replace(/^\//, "");
     const flag  = emoji ? `${escapeHTML(emoji)} ` : "";
     if (rel) {
       const url = encodeURI(BASE_COUNTRY_URL + rel);
@@ -106,20 +107,17 @@
     return toObjects(parseCSV(txt));
   }
 
-  // ====== GEO index (uses exact headers you provided) ======
+  // ====== GEO index (exact headers you provided) ======
   function buildGeoIndex(geo) {
     if (!geo.length) return { byIso:{}, list:[], keys:{} };
     const s = geo[0];
-
-    // Exact columns from ginc-geo.csv (with light fallbacks)
-    const isoK   = pickKey(s, ["country_iso","iso3","iso_a3","iso_alpha3","iso","alpha3"]);
-    const nameK  = pickKey(s, ["country_name","name","country"]);
-    const emojiK = pickKey(s, ["country_emoji","emoji"]);
-    const urlK   = pickKey(s, ["country_url","path","url"]);   // NOTE: not country_slug
+    const isoK       = pickKey(s, ["country_iso","iso3","iso_a3","iso_alpha3","iso","alpha3"]);
+    const nameK      = pickKey(s, ["country_name","name","country"]);
+    const emojiK     = pickKey(s, ["country_emoji","emoji"]);
+    const urlK       = pickKey(s, ["country_url","path","url"]);  // relative path
     const regionK    = pickKey(s, ["region"]);
     const subregionK = pickKey(s, ["sub_region","subregion","sub-region"]);
     const groupK     = pickKey(s, ["groups","group","memberships","membership"]);
-
     if (!isoK || !nameK) throw new Error("ginc-geo.csv missing country_iso or country_name.");
     const byIso = {};
     geo.forEach(r => {
@@ -130,7 +128,7 @@
     return { byIso, list: geo, keys:{ isoK,nameK,emojiK,urlK,regionK,subregionK,groupK } };
   }
 
-  // ====== Framework hierarchy (correct keys: *_name, *_url, *_var) ======
+  // ====== Framework hierarchy (correct *_name, *_url, *_var) ======
   function buildFrameworkHierarchy(fw) {
     if (!fw.length) return { domains: [], keys:{} };
     const s = fw[0];
@@ -152,9 +150,9 @@
     const pillarColorK= pickKey(s, ["pillar_color","color","hex","colour","color_hex","colour_hex"]);
 
     const getVar = (row, varK, urlK, nameK) => {
-      if (varK && row[varK]) return ci(row[varK]);
-      if (urlK && row[urlK]) return toSlug(row[urlK]);
-      if (nameK && row[nameK]) return toSlug(row[nameK]);
+      if (varK && row[varK]) return slug(row[varK]);
+      if (urlK && row[urlK]) return slug(row[urlK]);
+      if (nameK && row[nameK]) return slug(row[nameK]);
       return "";
     };
 
@@ -217,60 +215,72 @@
     };
   }
 
-// ====== Ratings index (prefers 'assessment_type'; falls back to inference) ======
-function buildRatingsIndex(ratings) {
-  if (!ratings.length) return { by: { domain:new Map(), subdomain:new Map(), pillar:new Map() }, keys:{} };
+  // ====== Ratings index (prefers 'assessment_type'; normalizes IDs; dedups) ======
+  function buildRatingsIndex(ratings) {
+    if (!ratings.length) return { by: { domain:new Map(), subdomain:new Map(), pillar:new Map() }, keys:{} };
 
-  const s = ratings[0];
+    const s = ratings[0];
+    const isoK        = pickKey(s, ["country_iso","iso3","iso_a3","iso_alpha3","iso","alpha3"]);
+    const assessK     = pickKey(s, ["assessment_type","assessment","assessment_level","level","type"]);
+    const domainVarK  = pickKey(s, ["domain_var","domain_key","domain","domain_url"]);
+    const subVarK     = pickKey(s, ["subdomain_var","subdomain_key","subdomain","subdomain_url"]);
+    const pillarVarK  = pickKey(s, ["pillar_var","pillar_key","pillar","pillar_url","component","component_var"]);
+    const ratingK     = pickKey(s, ["rating"]);
+    const scoreK      = pickKey(s, ["score","value","points"]);
+    const outlookK    = pickKey(s, ["outlook"]);
+    const dateK       = pickKey(s, ["date","asof","as_at","as-of"]);
 
-  // ISO: your file uses country_iso (keep broad fallbacks for safety)
-  const isoK        = pickKey(s, ["country_iso","iso3","iso_a3","iso_alpha3","iso","alpha3"]);
+    if (!isoK) throw new Error("ginc-ratings.csv missing ISO column (expected 'country_iso' or equivalent).");
+    if (!ratingK || !scoreK) throw new Error("ginc-ratings.csv missing rating/score columns.");
 
-  // NEW: prefer 'assessment_type' (domain|subdomain|pillar)
-  const assessK     = pickKey(s, ["assessment_type","assessment","assessment_level","level","type"]);
+    const by = { domain:new Map(), subdomain:new Map(), pillar:new Map() };
 
-  // Prefer *_var; keep fallbacks so older extracts still work
-  const domainVarK  = pickKey(s, ["domain_var","domain_key","domain","domain_url"]);
-  const subVarK     = pickKey(s, ["subdomain_var","subdomain_key","subdomain","subdomain_url"]);
-  const pillarVarK  = pickKey(s, ["pillar_var","pillar_key","pillar","pillar_url","component","component_var"]);
+    const better = (a, b) => {
+      const as = safeNum(a?.[scoreK]); const bs = safeNum(b?.[scoreK]);
+      if (Number.isFinite(as) && Number.isFinite(bs)) {
+        if (bs > as) return b;
+        if (as > bs) return a;
+      } else if (Number.isFinite(bs)) return b;
+      else if (Number.isFinite(as)) return a;
 
-  const ratingK     = pickKey(s, ["rating"]);
-  const scoreK      = pickKey(s, ["score","value","points"]);
-  const outlookK    = pickKey(s, ["outlook"]);
-  const dateK       = pickKey(s, ["date","asof","as_at","as-of"]);
+      const ad = parseWhen(a?.[dateK]); const bd = parseWhen(b?.[dateK]);
+      if (Number.isFinite(bd) && Number.isFinite(ad)) return (bd > ad) ? b : a;
+      if (Number.isFinite(bd)) return b;
+      return a ?? b;
+    };
 
-  if (!isoK) throw new Error("ginc-ratings.csv missing ISO column (expected 'country_iso' or equivalent).");
-  if (!ratingK || !scoreK) throw new Error("ginc-ratings.csv missing rating/score columns.");
+    ratings.forEach(r => {
+      const iso = (r[isoK] || "").trim().toUpperCase();
+      if (!iso) return;
 
-  const by = { domain:new Map(), subdomain:new Map(), pillar:new Map() };
+      // Determine level (explicit or inferred)
+      let level = assessK ? ci(r[assessK] || "") : "";
+      if (!by[level]) {
+        level =
+          (r[pillarVarK]  && r[pillarVarK].trim()) ? "pillar" :
+          (r[subVarK]     && r[subVarK].trim())    ? "subdomain" :
+          (r[domainVarK]  && r[domainVarK].trim()) ? "domain" : "";
+      }
+      if (!by[level]) return;
 
-  ratings.forEach(r => {
-    const iso = (r[isoK] || "").trim().toUpperCase();
-    if (!iso) return;
+      // Normalize identifier from the strongest available column
+      const idRaw =
+        level === "pillar"    ? (r[pillarVarK]  || "") :
+        level === "subdomain" ? (r[subVarK]     || "") :
+        level === "domain"    ? (r[domainVarK]  || "") : "";
+      const id = slug(idRaw);
+      if (!id) return;
 
-    // Use assessment_type when present; otherwise infer from populated *_var
-    let level = assessK ? ci(r[assessK] || "") : "";
-    if (!by[level]) {
-      level =
-        (r[pillarVarK]  && r[pillarVarK].trim()) ? "pillar" :
-        (r[subVarK]     && r[subVarK].trim())    ? "subdomain" :
-        (r[domainVarK]  && r[domainVarK].trim()) ? "domain" : "";
-    }
-    if (!by[level]) return;
+      const key = `${iso}|${id}`;
+      const prev = by[level].get(key);
+      if (!prev) by[level].set(key, r);
+      else by[level].set(key, better(prev, r));
+    });
 
-    const id =
-      level === "pillar"    ? ci(r[pillarVarK]  || "") :
-      level === "subdomain" ? ci(r[subVarK]     || "") :
-      level === "domain"    ? ci(r[domainVarK]  || "") : "";
+    return { by, keys:{ isoK, assessK, domainVarK, subVarK, pillarVarK, ratingK, scoreK, outlookK, dateK } };
+  }
 
-    if (!id) return;
-    by[level].set(`${iso}|${id}`, r);
-  });
-
-  return { by, keys:{ isoK, assessK, domainVarK, subVarK, pillarVarK, ratingK, scoreK, outlookK, dateK } };
-}
-
-  // ====== Filtering (maps to region / sub_region / groups) ======
+  // ====== Filtering (region / sub_region / groups) ======
   function countryPassesFilters(geoRow, geoKeys, filters) {
     if (!geoRow) return false;
     const { region, subregion, group } = filters;
@@ -346,19 +356,19 @@ function buildRatingsIndex(ratings) {
 
     // Walk Domain -> Subdomain -> Pillars
     fw.domains.forEach(d => {
-      const dKey = `${iso}|${ci(d.slug)}`;
+      const dKey = `${iso}|${slug(d.slug)}`;
       const dRow = ratingsIdx.by.domain.get(dKey);
       pushRow("ginc-row--domain", d.name, dRow);
 
       d.subdomains.forEach(sd => {
         if (sd.slug) {
-          const sdKey = `${iso}|${ci(sd.slug)}`;
+          const sdKey = `${iso}|${slug(sd.slug)}`;
           const sdRow = ratingsIdx.by.subdomain.get(sdKey);
           pushRow("ginc-row--subdomain", sd.name, sdRow);
         }
 
         sd.pillars.forEach(p => {
-          const pKey = `${iso}|${ci(p.slug)}`;
+          const pKey = `${iso}|${slug(p.slug)}`;
           const pRow = ratingsIdx.by.pillar.get(pKey);
           const style = p.color ? `background-color:${p.color};` : "";
           pushRow("ginc-row--pillar", p.name, pRow, style);
@@ -375,9 +385,9 @@ function buildRatingsIndex(ratings) {
   }
 
   function renderOverallTable(mount, fw, ratingsIdx, geoIdx, filters) {
-    const ensureDomain = (slug, fallbackName) => {
-      const found = fw.domains.find(d => ci(d.slug)===ci(slug));
-      return found || { slug, name: fallbackName || titleize(slug) };
+    const ensureDomain = (slugStr, fallbackName) => {
+      const found = fw.domains.find(d => slug(d.slug)===slug(slugStr));
+      return found || { slug: slug(slugStr), name: fallbackName || titleize(slugStr) };
     };
     const D = [
       ensureDomain("hard-power",     "Hard Power"),
@@ -397,21 +407,28 @@ function buildRatingsIndex(ratings) {
     ];
     const { table, tbody } = mkTable(cols);
 
-    const isoList = geoIdx.list
-      .filter(r => countryPassesFilters(r, geoIdx.keys, filters))
-      .map(r => (r[geoIdx.keys.isoK]||"").trim().toUpperCase());
+    const isoList = Array.from(new Set(
+      geoIdx.list
+        .filter(r => countryPassesFilters(r, geoIdx.keys, filters))
+        .map(r => (r[geoIdx.keys.isoK]||"").trim().toUpperCase())
+        .filter(Boolean)
+    ));
 
     const rows = isoList.map(iso => {
-      const d0 = ratingsIdx.by.domain.get(`${iso}|${ci(D[0].slug)}`);
-      const d1 = ratingsIdx.by.domain.get(`${iso}|${ci(D[1].slug)}`);
-      const d2 = ratingsIdx.by.domain.get(`${iso}|${ci(D[2].slug)}`);
+      const d0 = ratingsIdx.by.domain.get(`${iso}|${slug(D[0].slug)}`);
+      const d1 = ratingsIdx.by.domain.get(`${iso}|${slug(D[1].slug)}`);
+      const d2 = ratingsIdx.by.domain.get(`${iso}|${slug(D[2].slug)}`);
       const s0 = safeNum(d0?.[ratingsIdx.keys.scoreK]);
       const s1 = safeNum(d1?.[ratingsIdx.keys.scoreK]);
       const s2 = safeNum(d2?.[ratingsIdx.keys.scoreK]);
       const haveAll = [s0,s1,s2].every(n=>Number.isFinite(n));
       const avg = haveAll ? (s0+s1+s2)/3 : -Infinity;
-      return { iso, d0, d1, d2, avg };
-    }).sort((a,b) => b.avg - a.avg);
+      const name = (geoIdx.byIso[iso]?.[geoIdx.keys.nameK] || "").trim();
+      return { iso, name, d0, d1, d2, avg };
+    }).sort((a,b) => {
+      if (b.avg !== a.avg) return b.avg - a.avg;
+      return a.name.localeCompare(b.name, undefined, { sensitivity:"base" });
+    });
 
     rows.forEach(r => {
       const geoRow = geoIdx.byIso[r.iso];
@@ -439,10 +456,11 @@ function buildRatingsIndex(ratings) {
 
   function renderOneLevelTable(mount, level, focusSlug, ratingsIdx, geoIdx, filters) {
     if (!focusSlug) return renderError(mount, `Missing required attribute: data-focus for ${level} table.`);
+    const focusId = slug(focusSlug); // canonicalize
 
     const caption = document.createElement("div");
     caption.className = "ginc-cap-caption";
-    caption.textContent = `${titleize(level)} — ${titleize(focusSlug)}`;
+    caption.textContent = `${titleize(level)} — ${titleize(focusId)}`;
 
     const cols = [
       { key:"country", header:"Country" },
@@ -452,17 +470,25 @@ function buildRatingsIndex(ratings) {
     ];
     const { table, tbody } = mkTable(cols);
 
-    const isoList = geoIdx.list
-      .filter(r => countryPassesFilters(r, geoIdx.keys, filters))
-      .map(r => (r[geoIdx.keys.isoK]||"").trim().toUpperCase());
+    // Unique ISO list post-filters
+    const isoList = Array.from(new Set(
+      geoIdx.list
+        .filter(r => countryPassesFilters(r, geoIdx.keys, filters))
+        .map(r => (r[geoIdx.keys.isoK]||"").trim().toUpperCase())
+        .filter(Boolean)
+    ));
 
+    // One row per ISO for the exact (normalized) focus
     const rows = isoList.map(iso => {
-      const key = `${iso}|${ci(focusSlug)}`;
-      const rr = ratingsIdx.by[level]?.get(key);
+      const rr = ratingsIdx.by[level]?.get(`${iso}|${focusId}`);
       const score = safeNum(rr?.[ratingsIdx.keys.scoreK]);
-      return { iso, rr, score };
+      const name  = (geoIdx.byIso[iso]?.[geoIdx.keys.nameK] || "").trim();
+      return { iso, name, rr, score };
     }).filter(r => Number.isFinite(r.score))
-      .sort((a,b) => (b.score - a.score));
+      .sort((a,b) => {
+        if (b.score !== a.score) return b.score - a.score;            // score desc
+        return a.name.localeCompare(b.name, undefined, { sensitivity:"base" }); // alpha asc
+      });
 
     rows.forEach(({ iso, rr }) => {
       const geoRow = geoIdx.byIso[iso];
@@ -491,8 +517,8 @@ function buildRatingsIndex(ratings) {
 
   // ====== Init per element ======
   async function initOne(el, shared) {
-    const dimension = ci(el.getAttribute("data-dimension") || "");
-    const focus     = ci(el.getAttribute("data-focus") || "");
+    const dimension = slug(el.getAttribute("data-dimension") || "");
+    const focus     = el.getAttribute("data-focus") || "";
     const isoAttr   = (el.getAttribute("data-iso") || "").trim().toUpperCase();
 
     const region    = el.getAttribute("data-region")    || "";

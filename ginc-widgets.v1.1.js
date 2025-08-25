@@ -17,12 +17,10 @@
       .ginc-cap-table th, .ginc-cap-table td { padding:8px 10px; vertical-align:top; text-align:left; }
       .ginc-cap-table thead th { font-weight:600; }
       .ginc-cap-error { color:#b00020; padding:6px 0; }
-      /* Hierarchy styling for country dimension */
-      .ginc-row--domain    td:first-child { font-weight:700; text-transform:none; padding-top:14px; }
+      .ginc-row--domain    td:first-child { font-weight:700; padding-top:14px; }
       .ginc-row--subdomain td:first-child { font-weight:600; padding-left:14px; }
       .ginc-row--pillar    td:first-child { padding-left:28px; }
       .ginc-row--pillar td { border-bottom: 1px solid rgba(0,0,0,.06); }
-      /* Keep it clean & borderless otherwise */
     `;
     const style = document.createElement("style");
     style.id = "ginc-capability-table-styles";
@@ -30,7 +28,7 @@
     document.head.appendChild(style);
   }
 
-  // ====== CSV Parser (robust) ======
+  // ====== CSV Parser ======
   const parseCSV = (csvText) => {
     const rows = [];
     let i = 0, field = "", row = [], inQuotes = false;
@@ -82,6 +80,7 @@
     return null;
   };
   const titleize = (slug="") => slug.split(/[-_ ]+/).map(w=>w? w[0].toUpperCase()+w.slice(1): "").join(" ");
+  const toSlug = (s="") => ci(s).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
   const escapeHTML = (v) => String(v)
     .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
 
@@ -107,7 +106,7 @@
     return toObjects(parseCSV(txt));
   }
 
-  // ====== Index & Accessors ======
+  // ====== GEO index ======
   function buildGeoIndex(geo) {
     if (!geo.length) return { byIso:{}, list:[], keys:{} };
     const s = geo[0];
@@ -115,8 +114,8 @@
     const nameK  = pickKey(s, ["country_name","name","country"]);
     const emojiK = pickKey(s, ["country_emoji","emoji"]);
     const slugK  = pickKey(s, ["country_slug","slug","path"]);
-    const regionK    = pickKey(s, ["region","world_region"]);
-    const subregionK = pickKey(s, ["subregion","sub_region","sub-region"]);
+    const regionK    = pickKey(s, ["region"]);
+    const subregionK = pickKey(s, ["subregion","sub_region"]);
     const groupK     = pickKey(s, ["group","groups","memberships","membership"]);
     if (!isoK || !nameK) throw new Error("ginc-geo.csv missing ISO or country name keys.");
     const byIso = {};
@@ -128,63 +127,74 @@
     return { byIso, list: geo, keys:{ isoK,nameK,emojiK,slugK,regionK,subregionK,groupK } };
   }
 
+  // ====== Framework hierarchy (corrected keys) ======
   function buildFrameworkHierarchy(fw) {
     if (!fw.length) return { domains: [], keys:{} };
     const s = fw[0];
-    const domainSlugK = pickKey(s, ["domain","domain_slug","domain_id"]);
-    const domainNameK = pickKey(s, ["domain_name","domain_label","domain_title","domain_display"]);
+
+    // CORRECTED: use *_name, *_url, *_var (with fallbacks & derivation)
+    const domainNameK = pickKey(s, ["domain_name"]);
+    const domainUrlK  = pickKey(s, ["domain_url"]);
+    let   domainVarK  = pickKey(s, ["domain_var"]);
     const domainOrderK= pickKey(s, ["domain_order","order_domain","domain_sort"]);
 
-    const subSlugK    = pickKey(s, ["subdomain","subdomain_slug","subdomain_id"]);
-    const subNameK    = pickKey(s, ["subdomain_name","subdomain_label","subdomain_title","subdomain_display"]);
+    const subNameK    = pickKey(s, ["subdomain_name"]);
+    const subUrlK     = pickKey(s, ["subdomain_url"]);
+    let   subVarK     = pickKey(s, ["subdomain_var"]);
     const subOrderK   = pickKey(s, ["subdomain_order","order_subdomain","subdomain_sort"]);
 
-    const pillarSlugK = pickKey(s, ["pillar","pillar_slug","pillar_id"]);
-    const pillarNameK = pickKey(s, ["pillar_name","pillar_label","pillar_title","pillar_display"]);
+    const pillarNameK = pickKey(s, ["pillar_name"]);
+    const pillarUrlK  = pickKey(s, ["pillar_url"]);
+    let   pillarVarK  = pickKey(s, ["pillar_var"]);
     const pillarOrderK= pickKey(s, ["pillar_order","order_pillar","pillar_sort","order"]);
-    const pillarColorK= pickKey(s, ["pillar_color","color","hex","colour"]);
+    const pillarColorK= pickKey(s, ["pillar_color","color","hex","colour","color_hex","colour_hex"]);
 
-    if (!domainSlugK) throw new Error("ginc-framework.csv missing domain key.");
-    if (!pillarSlugK) throw new Error("ginc-framework.csv missing pillar key.");
+    // soft guards: derive *_var when absent
+    const getVar = (row, varK, urlK, nameK) => {
+      if (varK && row[varK]) return ci(row[varK]);
+      if (urlK && row[urlK]) return toSlug(row[urlK]);
+      if (nameK && row[nameK]) return toSlug(row[nameK]);
+      return "";
+    };
 
     // Build Domains -> Subdomains -> Pillars
     const domainMap = new Map();
     fw.forEach(r => {
-      const dSlug = ci(r[domainSlugK]||"");
-      if (!dSlug) return;
-      if (!domainMap.has(dSlug)) {
-        domainMap.set(dSlug, {
-          slug: dSlug,
-          name: (r[domainNameK] || titleize(dSlug)),
+      const dVar = getVar(r, domainVarK, domainUrlK, domainNameK);
+      if (!dVar) return;
+      if (!domainMap.has(dVar)) {
+        domainMap.set(dVar, {
+          slug: dVar,
+          name: (r[domainNameK] || titleize(dVar)),
           order: safeNum(r[domainOrderK]),
           subdomains: new Map()
         });
       }
-      const d = domainMap.get(dSlug);
+      const d = domainMap.get(dVar);
 
-      const sdSlug = ci(r[subSlugK]||"");
-      const sdKey = sdSlug || `__no_sub__:${d.subdomains.size}`;
+      const sdVar = getVar(r, subVarK, subUrlK, subNameK);
+      const sdKey = sdVar || `__no_sub__:${d.subdomains.size}`;
       if (!d.subdomains.has(sdKey)) {
         d.subdomains.set(sdKey, {
-          slug: sdSlug,
-          name: sdSlug ? (r[subNameK] || titleize(sdSlug)) : "",
+          slug: sdVar, // may be empty
+          name: sdVar ? (r[subNameK] || titleize(sdVar)) : "",
           order: safeNum(r[subOrderK]),
           pillars: []
         });
       }
       const sd = d.subdomains.get(sdKey);
 
-      const pSlug = ci(r[pillarSlugK]||"");
-      if (!pSlug) return;
+      const pVar = getVar(r, pillarVarK, pillarUrlK, pillarNameK);
+      if (!pVar) return;
       sd.pillars.push({
-        slug: pSlug,
-        name: (r[pillarNameK] || titleize(pSlug)),
+        slug: pVar,
+        name: (r[pillarNameK] || titleize(pVar)),
         order: safeNum(r[pillarOrderK]),
         color: (r[pillarColorK] || "").trim()
       });
     });
 
-    // Sort everything by order (fallback: alpha/insert order)
+    // Sort by provided order columns (fallback: insertion)
     const domains = Array.from(domainMap.values())
       .sort((a,b) => (isNaN(a.order)?Infinity:a.order) - (isNaN(b.order)?Infinity:b.order))
       .map(d => {
@@ -201,53 +211,51 @@
     return {
       domains,
       keys: {
-        domainSlugK, domainNameK, domainOrderK,
-        subSlugK, subNameK, subOrderK,
-        pillarSlugK, pillarNameK, pillarOrderK, pillarColorK
+        domainNameK, domainUrlK, domainVarK, domainOrderK,
+        subNameK, subUrlK, subVarK, subOrderK,
+        pillarNameK, pillarUrlK, pillarVarK, pillarOrderK, pillarColorK
       }
     };
   }
 
+  // ====== Ratings index (prefer *_var) ======
   function buildRatingsIndex(ratings) {
     if (!ratings.length) return { by: { domain:new Map(), subdomain:new Map(), pillar:new Map() }, keys:{} };
 
     const s = ratings[0];
-    const isoK   = pickKey(s, ["iso3","iso_a3","iso_alpha3","iso","alpha3"]);
-    const assessK= pickKey(s, ["assessment","level","type"]);
-    const domainK= pickKey(s, ["domain","domain_slug","domain_id"]);
-    const subK   = pickKey(s, ["subdomain","subdomain_slug","subdomain_id"]);
-    const pillarK= pickKey(s, ["pillar","pillar_slug","pillar_id","component"]);
-    const focusK = pickKey(s, ["focus","key","id"]); // optional fallback key if dataset uses a single field
-    const ratingK= pickKey(s, ["rating"]);
-    const scoreK = pickKey(s, ["score","value","points"]);
-    const outlookK=pickKey(s, ["outlook"]);
-    const dateK  = pickKey(s, ["date","asof","as_at","as-of"]);
+    const isoK     = pickKey(s, ["iso3","iso_a3","iso_alpha3","iso","alpha3"]);
+    const assessK  = pickKey(s, ["assessment","level","type"]);
+    // CORRECTED: prefer *_var columns
+    const domainVarK = pickKey(s, ["domain_var","domain_key"]);
+    const subVarK    = pickKey(s, ["subdomain_var","subdomain_key"]);
+    const pillarVarK = pickKey(s, ["pillar_var","pillar_key","component_var"]);
+    const ratingK  = pickKey(s, ["rating"]);
+    const scoreK   = pickKey(s, ["score","value","points"]);
+    const outlookK = pickKey(s, ["outlook"]);
+    const dateK    = pickKey(s, ["date","asof","as_at","as-of"]);
 
     if (!isoK || !assessK) throw new Error("ginc-ratings.csv missing ISO or assessment columns.");
     if (!ratingK || !scoreK) throw new Error("ginc-ratings.csv missing rating/score columns.");
 
     const by = { domain:new Map(), subdomain:new Map(), pillar:new Map() };
 
-    const keyFor = (iso, level, row) => {
-      // Prefer explicit column for the level; fallback to focus/id
-      let id = "";
-      if (level === "domain")    id = row[domainK]  ?? row[focusK] ?? "";
-      if (level === "subdomain") id = row[subK]     ?? row[focusK] ?? "";
-      if (level === "pillar")    id = row[pillarK]  ?? row[focusK] ?? "";
-      return `${iso}|${ci(String(id||""))}`;
+    const idFor = (level, row) => {
+      if (level === "domain")    return ci(row[domainVarK] || "");
+      if (level === "subdomain") return ci(row[subVarK]    || "");
+      if (level === "pillar")    return ci(row[pillarVarK] || "");
+      return "";
     };
 
     ratings.forEach(r => {
       const iso = (r[isoK]||"").trim().toUpperCase();
       const level = ci(r[assessK]||"");
-      if (!iso || !level) return;
-      if (!by[level]) return;
-
-      const k = keyFor(iso, level, r);
-      by[level].set(k, r);
+      if (!iso || !by[level]) return;
+      const id = idFor(level, r);
+      if (!id) return;
+      by[level].set(`${iso}|${id}`, r);
     });
 
-    return { by, keys:{ isoK, assessK, domainK, subK, pillarK, focusK, ratingK, scoreK, outlookK, dateK } };
+    return { by, keys:{ isoK, assessK, domainVarK, subVarK, pillarVarK, ratingK, scoreK, outlookK, dateK } };
   }
 
   // ====== Filtering ======
@@ -265,7 +273,6 @@
     if (group) {
       if (!geoKeys.groupK) return false;
       const raw = (geoRow[geoKeys.groupK]||"").toLowerCase();
-      // split on comma / pipe / semicolon / space
       const parts = raw.split(/[,;| ]+/).map(s=>s.trim()).filter(Boolean);
       if (!parts.includes(ci(group))) return false;
     }
@@ -355,17 +362,15 @@
   }
 
   function renderOverallTable(mount, fw, ratingsIdx, geoIdx, filters) {
-    // Determine the three domain slugs from framework
-    const domainTriplet = fw.domains
-      .filter(d => ["hard-power","soft-power","economic-power"].includes(ci(d.slug)))
-      .sort((a,b)=>["hard-power","soft-power","economic-power"].indexOf(ci(a.slug)) - ["hard-power","soft-power","economic-power"].indexOf(ci(b.slug)));
-
-    // If framework uses different labels/order, fallback by name match
-    const ensure = (slug) => fw.domains.find(d => ci(d.slug)===slug) || { slug, name: titleize(slug) };
+    // Match the three domain VARs (expecting "hard-power", "soft-power", "economic-power")
+    const ensureDomain = (slug, fallbackName) => {
+      const found = fw.domains.find(d => ci(d.slug)===ci(slug));
+      return found || { slug, name: fallbackName || titleize(slug) };
+    };
     const D = [
-      ensure("hard-power"),
-      ensure("soft-power"),
-      ensure("economic-power")
+      ensureDomain("hard-power",     "Hard Power"),
+      ensureDomain("soft-power",     "Soft Power"),
+      ensureDomain("economic-power", "Economic Power")
     ];
 
     const caption = document.createElement("div");
@@ -380,7 +385,6 @@
     ];
     const { table, tbody } = mkTable(cols);
 
-    // Collect countries (geo) that pass filters
     const isoList = geoIdx.list
       .filter(r => countryPassesFilters(r, geoIdx.keys, filters))
       .map(r => (r[geoIdx.keys.isoK]||"").trim().toUpperCase());
@@ -394,27 +398,22 @@
       const s2 = safeNum(d2?.[ratingsIdx.keys.scoreK]);
       const haveAll = [s0,s1,s2].every(n=>Number.isFinite(n));
       const avg = haveAll ? (s0+s1+s2)/3 : -Infinity;
-      return { iso, d0, d1, d2, s0, s1, s2, avg };
+      return { iso, d0, d1, d2, avg };
     }).sort((a,b) => b.avg - a.avg);
 
     rows.forEach(r => {
       const geoRow = geoIdx.byIso[r.iso];
       const tr = document.createElement("tr");
 
-      // Country
       const tdC = document.createElement("td");
       tdC.innerHTML = buildCountryHTML(geoRow, geoIdx.keys);
       tr.appendChild(tdC);
 
-      // Hard / Soft / Econ — show Ratings; (scores used for sort)
-      const tdH = document.createElement("td");
-      tdH.textContent = r.d0?.[ratingsIdx.keys.ratingK] ?? "";
-      const tdS = document.createElement("td");
-      tdS.textContent = r.d1?.[ratingsIdx.keys.ratingK] ?? "";
-      const tdE = document.createElement("td");
-      tdE.textContent = r.d2?.[ratingsIdx.keys.ratingK] ?? "";
-
+      const tdH = document.createElement("td"); tdH.textContent = r.d0?.[ratingsIdx.keys.ratingK] ?? "";
+      const tdS = document.createElement("td"); tdS.textContent = r.d1?.[ratingsIdx.keys.ratingK] ?? "";
+      const tdE = document.createElement("td"); tdE.textContent = r.d2?.[ratingsIdx.keys.ratingK] ?? "";
       tr.appendChild(tdH); tr.appendChild(tdS); tr.appendChild(tdE);
+
       tbody.appendChild(tr);
     });
 
@@ -445,13 +444,13 @@
       .filter(r => countryPassesFilters(r, geoIdx.keys, filters))
       .map(r => (r[geoIdx.keys.isoK]||"").trim().toUpperCase());
 
-    // Collect rows -> sort by score desc
     const rows = isoList.map(iso => {
       const key = `${iso}|${ci(focusSlug)}`;
       const rr = ratingsIdx.by[level]?.get(key);
       const score = safeNum(rr?.[ratingsIdx.keys.scoreK]);
       return { iso, rr, score };
-    }).sort((a,b) => (b.score - a.score));
+    }).filter(r => Number.isFinite(r.score))
+      .sort((a,b) => (b.score - a.score));
 
     rows.forEach(({ iso, rr }) => {
       const geoRow = geoIdx.byIso[iso];
@@ -481,7 +480,7 @@
   // ====== Init per element ======
   async function initOne(el, shared) {
     const dimension = ci(el.getAttribute("data-dimension") || "");
-    const focus     = ci(el.getAttribute("data-focus") || ""); // for domain/subdomain/pillar
+    const focus     = ci(el.getAttribute("data-focus") || "");
     const isoAttr   = (el.getAttribute("data-iso") || "").trim().toUpperCase();
 
     const region    = el.getAttribute("data-region")    || "";
@@ -490,23 +489,20 @@
     const filters   = { region, subregion, group };
 
     try {
-      const { framework, ratings, geo, fwH, rtIdx, geoIdx } = shared;
+      const { fwH, rtIdx, geoIdx } = shared;
 
       if (dimension === "country") {
         if (!isoAttr) return renderError(el, "Missing required attribute: data-iso for country table.");
         return renderCountryTable(el, isoAttr, fwH, rtIdx, geoIdx);
       }
-
       if (dimension === "overall") {
         return renderOverallTable(el, fwH, rtIdx, geoIdx, filters);
       }
-
       if (["domain","subdomain","pillar"].includes(dimension)) {
         return renderOneLevelTable(el, dimension, focus, rtIdx, geoIdx, filters);
       }
 
       return renderError(el, `Unknown data-dimension: "${dimension}".`);
-
     } catch (err) {
       renderError(el, err.message || String(err));
     }
@@ -519,7 +515,6 @@
     if (!mounts.length) return;
 
     try {
-      // Fetch all datasets once for all widgets on the page
       const [framework, ratings, geo] = await Promise.all([
         fetchCSVObjects(FRAMEWORK_URL),
         fetchCSVObjects(RATINGS_URL),
@@ -529,7 +524,7 @@
       const rtIdx = buildRatingsIndex(ratings);
       const geoIdx= buildGeoIndex(geo);
 
-      const shared = { framework, ratings, geo, fwH, rtIdx, geoIdx };
+      const shared = { fwH, rtIdx, geoIdx };
       for (const el of mounts) { await initOne(el, shared); }
     } catch (err) {
       mounts.forEach(el => renderError(el, err.message || String(err)));

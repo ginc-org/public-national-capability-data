@@ -17,10 +17,13 @@
       .ginc-cap-table th, .ginc-cap-table td { padding:8px 10px; vertical-align:top; text-align:left; }
       .ginc-cap-table thead th { font-weight:600; }
       .ginc-cap-error { color:#b00020; padding:6px 0; }
+      /* Country view hierarchy */
       .ginc-row--domain    td:first-child { font-weight:700; padding-top:14px; }
       .ginc-row--subdomain td:first-child { font-weight:600; padding-left:14px; }
       .ginc-row--pillar    td:first-child { padding-left:28px; }
       .ginc-row--pillar td { border-bottom: 1px solid rgba(0,0,0,.06); }
+      /* Rating separator row for one-level tables */
+      .ginc-cap-sep td { background:#f2f2f2; font-weight:700; padding:10px; }
     `;
     const style = document.createElement("style");
     style.id = "ginc-capability-table-styles";
@@ -215,7 +218,7 @@
     };
   }
 
-  // ====== Ratings index (prefers 'assessment_type'; normalizes IDs; dedups) ======
+  // ====== Ratings index (uses 'assessment_type'; normalizes IDs; captures pillar_hex; dedups) ======
   function buildRatingsIndex(ratings) {
     if (!ratings.length) return { by: { domain:new Map(), subdomain:new Map(), pillar:new Map() }, keys:{} };
 
@@ -229,6 +232,7 @@
     const scoreK      = pickKey(s, ["score","value","points"]);
     const outlookK    = pickKey(s, ["outlook"]);
     const dateK       = pickKey(s, ["date","asof","as_at","as-of"]);
+    const pillarHexK  = pickKey(s, ["pillar_hex"]); // <— from ginc-ratings.csv
 
     if (!isoK) throw new Error("ginc-ratings.csv missing ISO column (expected 'country_iso' or equivalent).");
     if (!ratingK || !scoreK) throw new Error("ginc-ratings.csv missing rating/score columns.");
@@ -263,7 +267,7 @@
       }
       if (!by[level]) return;
 
-      // Normalize identifier from the strongest available column
+      // Normalized identifier
       const idRaw =
         level === "pillar"    ? (r[pillarVarK]  || "") :
         level === "subdomain" ? (r[subVarK]     || "") :
@@ -277,7 +281,7 @@
       else by[level].set(key, better(prev, r));
     });
 
-    return { by, keys:{ isoK, assessK, domainVarK, subVarK, pillarVarK, ratingK, scoreK, outlookK, dateK } };
+    return { by, keys:{ isoK, assessK, domainVarK, subVarK, pillarVarK, ratingK, scoreK, outlookK, dateK, pillarHexK } };
   }
 
   // ====== Filtering (region / sub_region / groups) ======
@@ -319,6 +323,15 @@
     table.appendChild(tbody);
     return { table, tbody };
   }
+  function addRatingSeparator(tbody, colspan, ratingText) {
+    const sep = document.createElement("tr");
+    sep.className = "ginc-cap-sep";
+    const td = document.createElement("td");
+    td.colSpan = colspan;
+    td.textContent = ratingText || "Unrated";
+    sep.appendChild(td);
+    tbody.appendChild(sep);
+  }
 
   // ====== Dimension renderers ======
   function renderCountryTable(mount, iso, fw, ratingsIdx, geoIdx) {
@@ -336,10 +349,17 @@
     ];
     const { table, tbody } = mkTable(cols);
 
-    const pushRow = (cls, name, ratRow, extraStyle) => {
+    const pushRow = (cls, name, ratRow, fallbackHex) => {
       const tr = document.createElement("tr");
       if (cls) tr.className = cls;
-      if (extraStyle) tr.setAttribute("style", extraStyle);
+
+      // Use pillar_hex from ratings for pillar rows; fallback to framework hex
+      let bg = "";
+      if (cls === "ginc-row--pillar") {
+        const hex = ratingsIdx.keys.pillarHexK ? (ratRow?.[ratingsIdx.keys.pillarHexK] || "").trim() : "";
+        bg = hex || fallbackHex || "";
+      }
+      if (bg) tr.setAttribute("style", `background-color:${bg};`);
 
       const td0 = document.createElement("td");
       td0.textContent = name;
@@ -370,8 +390,9 @@
         sd.pillars.forEach(p => {
           const pKey = `${iso}|${slug(p.slug)}`;
           const pRow = ratingsIdx.by.pillar.get(pKey);
-          const style = p.color ? `background-color:${p.color};` : "";
-          pushRow("ginc-row--pillar", p.name, pRow, style);
+          // fallback to framework pillar color if ratings doesn't provide pillar_hex
+          const fallbackHex = (p.color || "").trim();
+          pushRow("ginc-row--pillar", p.name, pRow, fallbackHex);
         });
       });
     });
@@ -385,6 +406,7 @@
   }
 
   function renderOverallTable(mount, fw, ratingsIdx, geoIdx, filters) {
+    // Overall table keeps its simple layout (3 ratings per country), no rating separators
     const ensureDomain = (slugStr, fallbackName) => {
       const found = fw.domains.find(d => slug(d.slug)===slug(slugStr));
       return found || { slug: slug(slugStr), name: fallbackName || titleize(slugStr) };
@@ -470,7 +492,6 @@
     ];
     const { table, tbody } = mkTable(cols);
 
-    // Unique ISO list post-filters
     const isoList = Array.from(new Set(
       geoIdx.list
         .filter(r => countryPassesFilters(r, geoIdx.keys, filters))
@@ -478,19 +499,26 @@
         .filter(Boolean)
     ));
 
-    // One row per ISO for the exact (normalized) focus
+    // Collect, sort (score desc, name asc), and then insert rating separators
     const rows = isoList.map(iso => {
       const rr = ratingsIdx.by[level]?.get(`${iso}|${focusId}`);
       const score = safeNum(rr?.[ratingsIdx.keys.scoreK]);
       const name  = (geoIdx.byIso[iso]?.[geoIdx.keys.nameK] || "").trim();
-      return { iso, name, rr, score };
+      const rating= (rr?.[ratingsIdx.keys.ratingK] || "").trim();
+      return { iso, name, rr, score, rating };
     }).filter(r => Number.isFinite(r.score))
       .sort((a,b) => {
         if (b.score !== a.score) return b.score - a.score;            // score desc
         return a.name.localeCompare(b.name, undefined, { sensitivity:"base" }); // alpha asc
       });
 
-    rows.forEach(({ iso, rr }) => {
+    // Insert a separator row whenever rating changes
+    let lastRating = null;
+    rows.forEach(({ iso, rr, rating }) => {
+      if (rating !== lastRating) {
+        addRatingSeparator(tbody, 4, rating || "Unrated");
+        lastRating = rating;
+      }
       const geoRow = geoIdx.byIso[iso];
       const tr = document.createElement("tr");
 

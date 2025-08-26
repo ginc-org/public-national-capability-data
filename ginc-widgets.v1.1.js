@@ -370,7 +370,7 @@
 
       const td0 = document.createElement("td");
       if (cls === "ginc-row--pillar" && pillarHref) {
-        td0.innerHTML = `<a href="${pillarHref}">${escapeHTML(name)}</a>`;
+        td0.innerHTML = `<a href="/${(pillarHref || "").replace(/^\//, "")}">${escapeHTML(name)}</a>`;
       } else {
         td0.textContent = name;
       }

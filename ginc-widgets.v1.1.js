@@ -14,7 +14,7 @@
     const css = `
       .ginc-cap-wrap { width:100%; }
       .ginc-cap-caption { margin:6px 0 12px; color:#666; font-size:.9rem; }
-      .ginc-cap-table { width:100%; border-collapse:collapse; font-size: 1.5rem; }
+      .ginc-cap-table { width:100%; border-collapse:collapse; font-size:.95rem; }
       .ginc-cap-table th, .ginc-cap-table td { padding:8px 10px; vertical-align:top; text-align:left; }
       .ginc-cap-table thead th { font-weight:600; }
       .ginc-cap-error { color:#b00020; padding:6px 0; }
@@ -91,7 +91,6 @@
   const normalizeHex = (v) => {
     let s = (v||"").trim();
     if (!s) return "";
-    // add # if looks like 6-hex without prefix
     if (/^[0-9a-fA-F]{6}$/.test(s)) return "#"+s;
     return s;
   };
@@ -139,7 +138,7 @@
     return { byIso, list: geo, keys:{ isoK,nameK,emojiK,urlK,regionK,subregionK,groupK } };
   }
 
-  // ====== Framework hierarchy (correct *_name, *_url, *_var, and pillar_hex) ======
+  // ====== Framework hierarchy (correct *_name, *_url, *_var, and pillar_hex/url) ======
   function buildFrameworkHierarchy(fw) {
     if (!fw.length) return { domains: [], keys:{} };
     const s = fw[0];
@@ -196,11 +195,13 @@
       const pVar = getVar(r, pillarVarK, pillarUrlK, pillarNameK);
       if (!pVar) return;
       const pHex = normalizeHex((r[pillarHexK] || "").trim());
+      const pUrl = (r[pillarUrlK] || "").trim(); // store pillar_url for hyperlinking pillar_name
       sd.pillars.push({
         slug: pVar,
         name: (r[pillarNameK] || titleize(pVar)),
         order: safeNum(r[pillarOrderK]),
-        hex: pHex
+        hex: pHex,
+        url: pUrl
       });
     });
 
@@ -357,18 +358,23 @@
     ];
     const { table, tbody } = mkTable(cols);
 
-    const pushRow = (cls, name, ratRow, pillarHex) => {
+    const pushRow = (cls, name, ratRow, pillarHex, pillarHref) => {
       const tr = document.createElement("tr");
       if (cls) tr.className = cls;
 
-      // For pillar rows, use pillar_hex from ginc-framework.csv
+      // For pillar rows, use pillar_hex from framework (p.hex)
       if (cls === "ginc-row--pillar") {
         const bg = normalizeHex(pillarHex);
         if (bg) tr.setAttribute("style", `background-color:${bg};`);
       }
 
       const td0 = document.createElement("td");
-      td0.textContent = name;
+      if (cls === "ginc-row--pillar" && pillarHref) {
+        td0.innerHTML = `<a href="${pillarHref}">${escapeHTML(name)}</a>`;
+      } else {
+        td0.textContent = name;
+      }
+
       const td1 = document.createElement("td");
       td1.textContent = ratRow?.[ratingsIdx.keys.ratingK] ?? "";
       const td2 = document.createElement("td");
@@ -384,20 +390,20 @@
     fw.domains.forEach(d => {
       const dKey = `${iso}|${slug(d.slug)}`;
       const dRow = ratingsIdx.by.domain.get(dKey);
-      pushRow("ginc-row--domain", d.name, dRow, "");
+      pushRow("ginc-row--domain", d.name, dRow, "", "");
 
       d.subdomains.forEach(sd => {
         if (sd.slug) {
           const sdKey = `${iso}|${slug(sd.slug)}`;
           const sdRow = ratingsIdx.by.subdomain.get(sdKey);
-          pushRow("ginc-row--subdomain", sd.name, sdRow, "");
+          pushRow("ginc-row--subdomain", sd.name, sdRow, "", "");
         }
 
         sd.pillars.forEach(p => {
           const pKey = `${iso}|${slug(p.slug)}`;
           const pRow = ratingsIdx.by.pillar.get(pKey);
-          // Use pillar hex from framework (p.hex)
-          pushRow("ginc-row--pillar", p.name, pRow, p.hex || "");
+          // Link pillar_name to relative pillar_url
+          pushRow("ginc-row--pillar", p.name, pRow, p.hex || "", p.url || "");
         });
       });
     });

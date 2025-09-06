@@ -4,7 +4,8 @@
   const FRAMEWORK_URL = "https://ginc-org.github.io/public-national-capability-data/ginc-framework.csv";
   const RATINGS_URL   = "https://ginc-org.github.io/public-national-capability-data/ginc-ratings.csv";
   const GEO_URL       = "https://ginc-org.github.io/public-national-capability-data/ginc-geo.csv";
-  const ASSETS_URL    = "https://ginc-org.github.io/public-national-capability-data/ginc-assets.csv"; // NEW
+  const ASSETS_URL    = "https://ginc-org.github.io/public-national-capability-data/ginc-assets.csv"; // existing
+  const ORGS_URL      = "https://ginc-org.github.io/public-national-capability-data/ginc-orgs.csv";   // NEW
 
   const WIDGET_SELECTOR = '[data-widget="ginc-capability-table"]';
   const BASE_COUNTRY_URL = "https://www.ginc.org/"; // + country_url (relative)
@@ -553,105 +554,182 @@
     mount.appendChild(wrap);
   }
 
-  // ====== NEW: Assets renderer ======
-function renderAssetsTable(mount, assets, geoIdx, category, isoFilter) {
-  if (!assets || !assets.length) return renderError(mount, "No data found in ginc-assets.csv.");
+  // ====== Assets renderer (existing) ======
+  function renderAssetsTable(mount, assets, geoIdx, category, isoFilter) {
+    if (!assets || !assets.length) return renderError(mount, "No data found in ginc-assets.csv.");
 
-  const s = assets[0];
-  const isoK        = pickKey(s, ["country_iso","iso3","iso"]);
-  const nameK       = pickKey(s, ["asset_name","name"]);
-  const genK        = pickKey(s, ["asset_generation","generation"]);
-  const serviceK    = pickKey(s, ["asset_in_service","first_service","service_entry","in_service"]);
-  const typeK       = pickKey(s, ["asset_type","type"]);
-  const volK        = pickKey(s, ["asset_volume","total","count","quantity"]);
-  const categoryK   = pickKey(s, ["asset_category","category"]);
-  const profileK    = pickKey(s, ["profile_url","asset_url","url","profile"]);      // (existing) link for Name
-  const typeUrlK    = pickKey(s, ["asset_type_url","type_url","category_url"]);     // NEW: link for Type
+    const s = assets[0];
+    const isoK        = pickKey(s, ["country_iso","iso3","iso"]);
+    const nameK       = pickKey(s, ["asset_name","name"]);
+    const genK        = pickKey(s, ["asset_generation","generation"]);
+    const serviceK    = pickKey(s, ["asset_in_service","first_service","service_entry","in_service"]);
+    const typeK       = pickKey(s, ["asset_type","type"]);
+    const volK        = pickKey(s, ["asset_volume","total","count","quantity"]);
+    const categoryK   = pickKey(s, ["asset_category","category"]);
+    const profileK    = pickKey(s, ["profile_url","asset_url","url","profile"]);
+    const typeUrlK    = pickKey(s, ["asset_type_url","type_url","category_url"]);
 
-  if (!isoK || !nameK || !serviceK) {
-    return renderError(mount, "ginc-assets.csv missing required columns.");
+    if (!isoK || !nameK || !serviceK) {
+      return renderError(mount, "ginc-assets.csv missing required columns.");
+    }
+
+    let rows = assets.slice();
+    if (category && categoryK) rows = rows.filter(r => slug(r[categoryK]||"") === slug(category));
+    if (isoFilter && isoK) rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
+
+    rows.sort((a,b) => {
+      const an = safeNum(a[serviceK]); const bn = safeNum(b[serviceK]);
+      if (Number.isFinite(an) && Number.isFinite(bn)) return bn - an;
+      if (Number.isFinite(an)) return 1;
+      if (Number.isFinite(bn)) return -1;
+      const ad = parseWhen(a[serviceK]); const bd = parseWhen(b[serviceK]);
+      if (Number.isFinite(ad) && Number.isFinite(bd)) return bd - ad;
+      if (Number.isFinite(ad)) return 1;
+      if (Number.isFinite(bd)) return -1;
+      return 0;
+    });
+
+    const caption = document.createElement("div");
+    caption.className = "ginc-cap-caption";
+    caption.textContent = ["Assets", category ? `Category: ${category}` : "", isoFilter ? `ISO: ${isoFilter}` : ""]
+      .filter(Boolean).join(" — ");
+
+    const cols = [
+      { key:"name", header:"Name" },
+      { key:"type", header:"Type" },
+      { key:"gen",  header:"Gen" },
+      { key:"svc",  header:"Service" },
+      { key:"vol",  header:"Total" }
+    ];
+    const { table, tbody } = mkTable(cols);
+
+    rows.forEach(r => {
+      const tr = document.createElement("tr");
+
+      const iso = (r[isoK]||"").trim().toUpperCase();
+      const geoRow = geoIdx.byIso[iso];
+      const emoji = geoRow ? (geoRow[geoIdx.keys.emojiK] || "") : "";
+      const nameText = (r[nameK] || "").trim();
+      const tdName = document.createElement("td");
+      const relProfile = profileK ? (r[profileK] || "").trim().replace(/^\//, "") : "";
+      tdName.innerHTML = relProfile
+        ? `${emoji ? escapeHTML(emoji) + " " : ""}<a href="/${escapeHTML(relProfile)}">${escapeHTML(nameText)}</a>`
+        : `${emoji ? escapeHTML(emoji) + " " : ""}${escapeHTML(nameText)}`;
+
+      const tdType = document.createElement("td");
+      const typeText = (r[typeK] || "").trim();
+      const relTypeUrl = typeUrlK ? (r[typeUrlK] || "").trim().replace(/^\//, "") : "";
+      tdType.innerHTML = relTypeUrl
+        ? `<a href="/${escapeHTML(relTypeUrl)}">${escapeHTML(typeText)}</a>`
+        : escapeHTML(typeText);
+
+      const tdGen = document.createElement("td");
+      tdGen.textContent = r[genK] || "";
+
+      const tdSvc = document.createElement("td");
+      tdSvc.textContent = r[serviceK] || "";
+
+      const tdVol = document.createElement("td");
+      tdVol.textContent = r[volK] || "";
+
+      tr.appendChild(tdName);
+      tr.appendChild(tdType);
+      tr.appendChild(tdGen);
+      tr.appendChild(tdSvc);
+      tr.appendChild(tdVol);
+      tbody.appendChild(tr);
+    });
+
+    mount.innerHTML = "";
+    const wrap = document.createElement("div");
+    wrap.className = "ginc-cap-wrap";
+    wrap.appendChild(caption);
+    wrap.appendChild(table);
+    mount.appendChild(wrap);
   }
 
-  // Apply filters
-  let rows = assets.slice();
-  if (category && categoryK) rows = rows.filter(r => slug(r[categoryK]||"") === slug(category));
-  if (isoFilter && isoK) rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
+  // ====== NEW: Orgs renderer ======
+  function renderOrgsTable(mount, orgs, geoIdx, category, isoFilter) {
+    if (!orgs || !orgs.length) return renderError(mount, "No data found in ginc-orgs.csv.");
 
-  // Sort by asset_in_service (desc)
-  rows.sort((a,b) => {
-    const an = safeNum(a[serviceK]); const bn = safeNum(b[serviceK]);
-    if (Number.isFinite(an) && Number.isFinite(bn)) return bn - an;
-    if (Number.isFinite(an)) return 1;
-    if (Number.isFinite(bn)) return -1;
-    const ad = parseWhen(a[serviceK]); const bd = parseWhen(b[serviceK]);
-    if (Number.isFinite(ad) && Number.isFinite(bd)) return bd - ad;
-    if (Number.isFinite(ad)) return 1;
-    if (Number.isFinite(bd)) return -1;
-    return 0;
-  });
+    const s = orgs[0];
+    const isoK       = pickKey(s, ["country_iso","iso3","iso"]);
+    const nameK      = pickKey(s, ["org_name","name"]);
+    const typeK      = pickKey(s, ["org_type","type"]);
+    const foundedK   = pickKey(s, ["founded","year_founded","established"]);
+    const categoryK  = pickKey(s, ["org_category","category"]);
+    const profileK   = pickKey(s, ["profile_url","org_url","url","profile"]);
+    const websiteK   = pickKey(s, ["website","org_website","site"]);
 
-  // Caption & table
-  const caption = document.createElement("div");
-  caption.className = "ginc-cap-caption";
-  caption.textContent = ["Assets", category ? `Category: ${category}` : "", isoFilter ? `ISO: ${isoFilter}` : ""]
-    .filter(Boolean).join(" — ");
+    if (!isoK || !nameK) {
+      return renderError(mount, "ginc-orgs.csv missing required columns.");
+    }
 
-  const cols = [
-    { key:"name", header:"Name" },
-    { key:"type", header:"Type" },
-    { key:"gen",  header:"Gen" },
-    { key:"svc",  header:"Service" },
-    { key:"vol",  header:"Total" }
-  ];
-  const { table, tbody } = mkTable(cols);
+    // Filters
+    let rows = orgs.slice();
+    if (category && categoryK) rows = rows.filter(r => slug(r[categoryK]||"") === slug(category));
+    if (isoFilter && isoK) rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
 
-  // Rows
-  rows.forEach(r => {
-    const tr = document.createElement("tr");
+    // Sort by org_name ascending (alpha)
+    rows.sort((a,b) => {
+      const an = (a[nameK] || "").trim();
+      const bn = (b[nameK] || "").trim();
+      return an.localeCompare(bn, undefined, { sensitivity:"base" });
+    });
 
-    // Name = emoji (from geo via country_iso) + asset_name; only NAME is linked when profile_url present
-    const iso = (r[isoK]||"").trim().toUpperCase();
-    const geoRow = geoIdx.byIso[iso];
-    const emoji = geoRow ? (geoRow[geoIdx.keys.emojiK] || "") : "";
-    const nameText = (r[nameK] || "").trim();
-    const tdName = document.createElement("td");
-    const relProfile = profileK ? (r[profileK] || "").trim().replace(/^\//, "") : "";
-    tdName.innerHTML = relProfile
-      ? `${emoji ? escapeHTML(emoji) + " " : ""}<a href="/${escapeHTML(relProfile)}">${escapeHTML(nameText)}</a>`
-      : `${emoji ? escapeHTML(emoji) + " " : ""}${escapeHTML(nameText)}`;
+    // Caption & table
+    const caption = document.createElement("div");
+    caption.className = "ginc-cap-caption";
+    caption.textContent = ["Organizations", category ? `Category: ${category}` : "", isoFilter ? `ISO: ${isoFilter}` : ""]
+      .filter(Boolean).join(" — ");
 
-    const tdGen = document.createElement("td");
-    tdGen.textContent = r[genK] || "";
+    const cols = [
+      { key:"name", header:"Name" },
+      { key:"type", header:"Type" },
+      { key:"founded", header:"Founded" }
+    ];
+    const { table, tbody } = mkTable(cols);
 
-    const tdSvc = document.createElement("td");
-    tdSvc.textContent = r[serviceK] || "";
+    rows.forEach(r => {
+      const tr = document.createElement("tr");
 
-    // Type: link to asset_type_url if present (root-relative)
-    const tdType = document.createElement("td");
-    const typeText = (r[typeK] || "").trim();
-    const relTypeUrl = typeUrlK ? (r[typeUrlK] || "").trim().replace(/^\//, "") : "";
-    tdType.innerHTML = relTypeUrl
-      ? `<a href="/${escapeHTML(relTypeUrl)}">${escapeHTML(typeText)}</a>`
-      : escapeHTML(typeText);
+      const iso = (r[isoK]||"").trim().toUpperCase();
+      const geoRow = geoIdx.byIso[iso];
+      const emoji = geoRow ? (geoRow[geoIdx.keys.emojiK] || "") : "";
 
-    const tdVol = document.createElement("td");
-    tdVol.textContent = r[volK] || "";
+      const orgName = (r[nameK] || "").trim();
+      const profileRel = profileK ? (r[profileK] || "").trim() : "";
+      const websiteUrl = websiteK ? (r[websiteK] || "").trim() : "";
 
-    tr.appendChild(tdName);
-    tr.appendChild(tdType);
-    tr.appendChild(tdGen);
-    tr.appendChild(tdSvc);
-    tr.appendChild(tdVol);
-    tbody.appendChild(tr);
-  });
+      const tdName = document.createElement("td");
+      if (profileRel) {
+        const rel = profileRel.replace(/^\//, "");
+        tdName.innerHTML = `${emoji ? escapeHTML(emoji) + " " : ""}<a href="/${escapeHTML(rel)}">${escapeHTML(orgName)}</a>`;
+      } else if (websiteUrl) {
+        tdName.innerHTML = `${emoji ? escapeHTML(emoji) + " " : ""}<a href="${escapeHTML(websiteUrl)}">${escapeHTML(orgName)}</a>`;
+      } else {
+        tdName.innerHTML = `${emoji ? escapeHTML(emoji) + " " : ""}${escapeHTML(orgName)}`;
+      }
 
-  mount.innerHTML = "";
-  const wrap = document.createElement("div");
-  wrap.className = "ginc-cap-wrap";
-  wrap.appendChild(caption);
-  wrap.appendChild(table);
-  mount.appendChild(wrap);
-}
+      const tdType = document.createElement("td");
+      tdType.textContent = r[typeK] || "";
+
+      const tdFounded = document.createElement("td");
+      tdFounded.textContent = r[foundedK] || "";
+
+      tr.appendChild(tdName);
+      tr.appendChild(tdType);
+      tr.appendChild(tdFounded);
+      tbody.appendChild(tr);
+    });
+
+    mount.innerHTML = "";
+    const wrap = document.createElement("div");
+    wrap.className = "ginc-cap-wrap";
+    wrap.appendChild(caption);
+    wrap.appendChild(table);
+    mount.appendChild(wrap);
+  }
 
   // ====== Init per element ======
   async function initOne(el, shared) {
@@ -666,7 +744,7 @@ function renderAssetsTable(mount, assets, geoIdx, category, isoFilter) {
     const filters   = { region, subregion, group };
 
     try {
-      const { fwH, rtIdx, geoIdx, assets } = shared;
+      const { fwH, rtIdx, geoIdx, assets, orgs } = shared;
 
       if (dimension === "country") {
         if (!isoAttr) return renderError(el, "Missing required attribute: data-iso for country table.");
@@ -680,6 +758,9 @@ function renderAssetsTable(mount, assets, geoIdx, category, isoFilter) {
       }
       if (dimension === "assets") {
         return renderAssetsTable(el, assets, geoIdx, category, isoAttr);
+      }
+      if (dimension === "orgs") {
+        return renderOrgsTable(el, orgs, geoIdx, category, isoAttr);
       }
 
       return renderError(el, `Unknown data-dimension: "${dimension}".`);
@@ -695,21 +776,23 @@ function renderAssetsTable(mount, assets, geoIdx, category, isoFilter) {
     if (!mounts.length) return;
 
     const needsAssets = mounts.some(el => ci(el.getAttribute("data-dimension")||"") === "assets");
+    const needsOrgs   = mounts.some(el => ci(el.getAttribute("data-dimension")||"") === "orgs");
 
     try {
       const baseFetches = [
         fetchCSVObjects(FRAMEWORK_URL),
         fetchCSVObjects(RATINGS_URL),
-        fetchCSVObjects(GEO_URL)
+        fetchCSVObjects(GEO_URL),
       ];
-      if (needsAssets) baseFetches.push(fetchCSVObjects(ASSETS_URL)); else baseFetches.push(Promise.resolve([]));
+      baseFetches.push(needsAssets ? fetchCSVObjects(ASSETS_URL) : Promise.resolve([]));
+      baseFetches.push(needsOrgs   ? fetchCSVObjects(ORGS_URL)   : Promise.resolve([]));
 
-      const [framework, ratings, geo, assets] = await Promise.all(baseFetches);
+      const [framework, ratings, geo, assets, orgs] = await Promise.all(baseFetches);
       const fwH   = buildFrameworkHierarchy(framework);
       const rtIdx = buildRatingsIndex(ratings);
       const geoIdx= buildGeoIndex(geo);
 
-      const shared = { fwH, rtIdx, geoIdx, assets };
+      const shared = { fwH, rtIdx, geoIdx, assets, orgs };
       for (const el of mounts) { await initOne(el, shared); }
     } catch (err) {
       mounts.forEach(el => renderError(el, err.message || String(err)));

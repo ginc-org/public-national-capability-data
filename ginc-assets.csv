@@ -1,0 +1,35 @@
+asset_name,asset_category,asset_type,asset_generation,country_iso,profile_url,asset_in_service,asset_volume
+J-10 Vigorous Dragon,air_combat,Light multirole fighter,4th,CHN,,2006,300
+J-15 Flying Shark,air_combat,Carrier-based fighter,4th,CHN,,2014,50
+J-16,air_combat,Multirole strike fighter,4.5,CHN,,2015,150
+J-20 Mighty Dragon,air_combat,Stealth multirole fighter,5th,CHN,,2017,270
+J-7 (F-7),air_combat,Lightweight fighter,3rd,CHN,,1967,650
+J-8 Finback,air_combat,Interceptor/fighter,3rd,CHN,,1980,140
+Eurofighter Typhoon,air_combat,Multirole fighter,4.5,EUR,,2003,533
+Dassault Rafale,air_combat,Multirole fighter,4.5,FRA,,2001,260
+Mirage 2000,air_combat,Multirole fighter,4th,FRA,,1984,300
+Mirage III/V,air_combat,Fighter-bomber,3rd,FRA,,1961,230
+IAI Kfir,air_combat,Multirole fighter,3rd,ISR,,1975,20
+HAL Tejas,air_combat,Light multirole fighter,4th,IND,,2015,31
+Mitsubishi F-2,air_combat,Multirole fighter,4th,JAP,,2000,90
+JF-17 Thunder,air_combat,Light multirole fighter,4th,PAK,,2007,140
+MiG-21 Fishbed,air_combat,Supersonic fighter,3rd,RUS,,1959,200
+MiG-29 Fulcrum,air_combat,Multirole fighter,4th,RUS,,1983,788
+Su-27 Flanker,air_combat,Air superiority fighter,4th,RUS,,1985,200
+Su-30 Flanker-C,air_combat,Twin-seat multirole fighter,4th,RUS,,1996,600
+Su-33 Flanker-D,air_combat,Carrier-based fighter,4th,RUS,,1995,17
+Su-34 Fullback,air_combat,Fighter-bomber,4th,RUS,,2014,142
+Su-35 Flanker-E,air_combat,Multirole fighter,4.5,RUS,,2014,140
+Su-57 Felon,air_combat,Stealth multirole fighter,5th,RUS,,2020,24
+Saab JAS 39 Gripen,air_combat,Light multirole fighter,4th,SWE,,1996,150
+AIDC F-CK-1 Ching-Kuo,air_combat,Light multirole fighter,4th,TAI,,1994,130
+AV-8B Harrier II,air_combat,V/STOL attack fighter,4th,USA,,1985,120
+F-14 Tomcat,air_combat,Carrier-based fighter,4th,USA,,1974,41
+F-15E Strike Eagle,air_combat,Dual-role strike fighter,4th,USA,,1988,500
+F-16 Fighting Falcon,air_combat,Light multirole fighter,4th,USA,,1980,2084
+F-22 Raptor,air_combat,Stealth air superiority fighter,5th,USA,f-22-raptor,2005,178
+F-35 Lightning II,air_combat,Stealth multirole fighter,5th,USA,,2015,712
+F-4 Phantom II,air_combat,Multirole fighter-bomber,3rd,USA,,1960,113
+F-5 Tiger II,air_combat,Light fighter,3rd,USA,,1964,200
+F/A-18 Hornet,air_combat,Carrier-based multirole fighter,4th,USA,,1983,250
+F/A-18E/F Super Hornet,air_combat,Carrier-based multirole fighter,4.5,USA,,2001,550

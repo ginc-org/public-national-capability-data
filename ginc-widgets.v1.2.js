@@ -667,7 +667,10 @@
 
     // Filters
     let rows = orgs.slice();
-    // Replace the existing category filter with this:
+     // inside renderOrgsTable, replace:
+    // if (category && categoryK) rows = rows.filter(r => slug(r[categoryK]||"") === slug(category));
+
+    // with pipe-aware matching:
     if (category && categoryK) {
       const needle = slug(category);
       rows = rows.filter(r => {
@@ -676,7 +679,7 @@
         return parts.includes(needle);
       });
     }
-    if (isoFilter && isoK) rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
+   if (isoFilter && isoK) rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
 
     // Sort by org_name ascending (alpha)
     rows.sort((a,b) => {

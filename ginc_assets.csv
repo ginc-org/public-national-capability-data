@@ -33,3 +33,30 @@ F-4 Phantom II,air_combat,Multirole fighter-bomber,3rd,USA,,1960,113
 F-5 Tiger II,air_combat,Light fighter,3rd,USA,,1964,200
 F/A-18 Hornet,air_combat,Carrier-based multirole fighter,4th,USA,,1983,250
 F/A-18E/F Super Hornet,air_combat,Carrier-based multirole fighter,4.5,USA,,2001,550
+Type 99,main_battle_tank,MBT (ZTZ99),3rd,CHN,,2001,600
+Type 99A,main_battle_tank,MBT (ZTZ99A),3rd,CHN,,2011,600
+VT-4 (MBT-3000),main_battle_tank,MBT (exp.),3rd,CHN,,2017,234
+Leopard 2,main_battle_tank,MBT,3rd,DEU,,1979,2500
+Ramses II,main_battle_tank,Upg. MBT (T-54/55),2nd,EGY,,2004,840
+Leclerc,main_battle_tank,MBT (AMX-56),3rd,FRA,,1992,627
+Challenger 2,main_battle_tank,MBT,3rd,GBR,,1998,196
+Merkava Mk.IV,main_battle_tank,MBT,3rd,ISR,,2004,660
+Arjun,main_battle_tank,MBT (Mk.1/Mk.1A),3rd,IND,,2004,140
+Karrar,main_battle_tank,MBT (indig.),3rd,IND,,2017,420
+Ariete,main_battle_tank,MBT (C1),3rd,ITA,,1995,150
+Type 10,main_battle_tank,MBT,4th,JPN,,2012,106
+Type 90,main_battle_tank,MBT,3rd,JPN,,1990,341
+K1A1/A2,main_battle_tank,MBT (120 mm armmt.),3rd,KOR,,1999,484
+K2 Black Panther,main_battle_tank,MBT (advanced),4th,KOR,,2014,252
+Al-Khalid,main_battle_tank,MBT (MBT-2000 var.),3rd,PAK,,2001,600
+Al-Zarrar,main_battle_tank,Upg. MBT (Type 59 retro.),2nd,PAK,,2004,750
+Type 85-IIAP,main_battle_tank,MBT (lic. built),3rd,PAK,,1992,410
+PT-91 Twardy,main_battle_tank,MBT (T-72M upgrade),3rd,POL,,1995,172
+T-55,main_battle_tank,MBT (med.),1st,RUS,,1948,3500
+T-62,main_battle_tank,MBT,2nd,RUS,,1961,2000
+T-64,main_battle_tank,MBT,2nd,RUS,,1966,1000
+T-72,main_battle_tank,MBT,2nd,RUS,,1973,8000
+T-80,main_battle_tank,MBT,3rd,RUS,,1976,500
+T-90,main_battle_tank,MBT,3rd,RUS,,1992,3000
+Altay,main_battle_tank,MBT (indig.),3rd,TUR,,2023,7
+M1 Abrams,main_battle_tank,MBT,3rd,USA,,1980,4500

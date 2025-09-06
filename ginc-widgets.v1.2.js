@@ -598,10 +598,10 @@ function renderAssetsTable(mount, assets, geoIdx, category, isoFilter) {
 
   const cols = [
     { key:"name", header:"Name" },
-    { key:"gen", header:"Generation" },
-    { key:"svc", header:"First Service" },
     { key:"type", header:"Type" },
-    { key:"vol", header:"Total" }
+    { key:"gen",  header:"Gen" },
+    { key:"svc",  header:"Service" },
+    { key:"vol",  header:"Total" }
   ];
   const { table, tbody } = mkTable(cols);
 
@@ -638,9 +638,9 @@ function renderAssetsTable(mount, assets, geoIdx, category, isoFilter) {
     tdVol.textContent = r[volK] || "";
 
     tr.appendChild(tdName);
+    tr.appendChild(tdType);
     tr.appendChild(tdGen);
     tr.appendChild(tdSvc);
-    tr.appendChild(tdType);
     tr.appendChild(tdVol);
     tbody.appendChild(tr);
   });

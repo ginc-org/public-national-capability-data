@@ -667,7 +667,15 @@
 
     // Filters
     let rows = orgs.slice();
-    if (category && categoryK) rows = rows.filter(r => slug(r[categoryK]||"") === slug(category));
+    // Replace the existing category filter with this:
+    if (category && categoryK) {
+      const needle = slug(category);
+      rows = rows.filter(r => {
+        const raw = (r[categoryK] || "");
+        const parts = raw.split("|").map(s => slug(s)).filter(Boolean);
+        return parts.includes(needle);
+      });
+    }
     if (isoFilter && isoK) rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
 
     // Sort by org_name ascending (alpha)

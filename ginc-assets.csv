@@ -1,62 +1,84 @@
-asset_name,asset_category,asset_type,asset_generation,country_iso,profile_url,asset_in_service,asset_volume
-J-10 Vigorous Dragon,air_combat,Light multirole fighter,4th,CHN,,2006,300
-J-15 Flying Shark,air_combat,Carrier-based fighter,4th,CHN,,2014,50
-J-16,air_combat,Multirole strike fighter,4.5,CHN,,2015,150
-J-20 Mighty Dragon,air_combat,Stealth multirole fighter,5th,CHN,,2017,270
-J-7 (F-7),air_combat,Lightweight fighter,3rd,CHN,,1967,650
-J-8 Finback,air_combat,Interceptor/fighter,3rd,CHN,,1980,140
-Eurofighter Typhoon,air_combat,Multirole fighter,4.5,EUR,,2003,533
-Dassault Rafale,air_combat,Multirole fighter,4.5,FRA,,2001,260
-Mirage 2000,air_combat,Multirole fighter,4th,FRA,,1984,300
-Mirage III/V,air_combat,Fighter-bomber,3rd,FRA,,1961,230
-IAI Kfir,air_combat,Multirole fighter,3rd,ISR,,1975,20
-HAL Tejas,air_combat,Light multirole fighter,4th,IND,,2015,31
-Mitsubishi F-2,air_combat,Multirole fighter,4th,JAP,,2000,90
-JF-17 Thunder,air_combat,Light multirole fighter,4th,PAK,,2007,140
-MiG-21 Fishbed,air_combat,Supersonic fighter,3rd,RUS,,1959,200
-MiG-29 Fulcrum,air_combat,Multirole fighter,4th,RUS,,1983,788
-Su-27 Flanker,air_combat,Air superiority fighter,4th,RUS,,1985,200
-Su-30 Flanker-C,air_combat,Twin-seat multirole fighter,4th,RUS,,1996,600
-Su-33 Flanker-D,air_combat,Carrier-based fighter,4th,RUS,,1995,17
-Su-34 Fullback,air_combat,Fighter-bomber,4th,RUS,,2014,142
-Su-35 Flanker-E,air_combat,Multirole fighter,4.5,RUS,,2014,140
-Su-57 Felon,air_combat,Stealth multirole fighter,5th,RUS,,2020,24
-Saab JAS 39 Gripen,air_combat,Light multirole fighter,4th,SWE,,1996,150
-AIDC F-CK-1 Ching-Kuo,air_combat,Light multirole fighter,4th,TAI,,1994,130
-AV-8B Harrier II,air_combat,V/STOL attack fighter,4th,USA,,1985,120
-F-14 Tomcat,air_combat,Carrier-based fighter,4th,USA,,1974,41
-F-15E Strike Eagle,air_combat,Dual-role strike fighter,4th,USA,,1988,500
-F-16 Fighting Falcon,air_combat,Light multirole fighter,4th,USA,,1980,2084
-F-22 Raptor,air_combat,Stealth air superiority fighter,5th,USA,f-22-raptor,2005,178
-F-35 Lightning II,air_combat,Stealth multirole fighter,5th,USA,,2015,712
-F-4 Phantom II,air_combat,Multirole fighter-bomber,3rd,USA,,1960,113
-F-5 Tiger II,air_combat,Light fighter,3rd,USA,,1964,200
-F/A-18 Hornet,air_combat,Carrier-based multirole fighter,4th,USA,,1983,250
-F/A-18E/F Super Hornet,air_combat,Carrier-based multirole fighter,4.5,USA,,2001,550
-Type 99,main_battle_tank,MBT (ZTZ99),3rd,CHN,,2001,600
-Type 99A,main_battle_tank,MBT (ZTZ99A),3rd,CHN,,2011,600
-VT-4 (MBT-3000),main_battle_tank,MBT (exp.),3rd,CHN,,2017,234
-Leopard 2,main_battle_tank,MBT,3rd,DEU,,1979,2500
-Ramses II,main_battle_tank,Upg. MBT (T-54/55),2nd,EGY,,2004,840
-Leclerc,main_battle_tank,MBT (AMX-56),3rd,FRA,,1992,627
-Challenger 2,main_battle_tank,MBT,3rd,GBR,,1998,196
-Merkava Mk.IV,main_battle_tank,MBT,3rd,ISR,,2004,660
-Arjun,main_battle_tank,MBT (Mk.1/Mk.1A),3rd,IND,,2004,140
-Karrar,main_battle_tank,MBT (indig.),3rd,IND,,2017,420
-Ariete,main_battle_tank,MBT (C1),3rd,ITA,,1995,150
-Type 10,main_battle_tank,MBT,4th,JPN,,2012,106
-Type 90,main_battle_tank,MBT,3rd,JPN,,1990,341
-K1A1/A2,main_battle_tank,MBT (120 mm armmt.),3rd,KOR,,1999,484
-K2 Black Panther,main_battle_tank,MBT (advanced),4th,KOR,,2014,252
-Al-Khalid,main_battle_tank,MBT (MBT-2000 var.),3rd,PAK,,2001,600
-Al-Zarrar,main_battle_tank,Upg. MBT (Type 59 retro.),2nd,PAK,,2004,750
-Type 85-IIAP,main_battle_tank,MBT (lic. built),3rd,PAK,,1992,410
-PT-91 Twardy,main_battle_tank,MBT (T-72M upgrade),3rd,POL,,1995,172
-T-55,main_battle_tank,MBT (med.),1st,RUS,,1948,3500
-T-62,main_battle_tank,MBT,2nd,RUS,,1961,2000
-T-64,main_battle_tank,MBT,2nd,RUS,,1966,1000
-T-72,main_battle_tank,MBT,2nd,RUS,,1973,8000
-T-80,main_battle_tank,MBT,3rd,RUS,,1976,500
-T-90,main_battle_tank,MBT,3rd,RUS,,1992,3000
-Altay,main_battle_tank,MBT (indig.),3rd,TUR,,2023,7
-M1 Abrams,main_battle_tank,MBT,3rd,USA,,1980,4500
+asset_name,asset_category,asset_type,asset_type_url,asset_generation,country_iso,profile_url,asset_in_service,asset_volume
+J-10 Vigorous Dragon,air_combat,Light multirole fighter,air-combat,4th,CHN,,2006,300
+J-15 Flying Shark,air_combat,Carrier-based fighter,air-combat,4th,CHN,,2014,50
+J-16,air_combat,Multirole strike fighter,air-combat,4.5,CHN,,2015,150
+J-20 Mighty Dragon,air_combat,Stealth multirole fighter,air-combat,5th,CHN,,2017,270
+J-7 (F-7),air_combat,Lightweight fighter,air-combat,3rd,CHN,,1967,650
+J-8 Finback,air_combat,Interceptor/fighter,air-combat,3rd,CHN,,1980,140
+Eurofighter Typhoon,air_combat,Multirole fighter,air-combat,4.5,EUR,,2003,533
+Dassault Rafale,air_combat,Multirole fighter,air-combat,4.5,FRA,,2001,260
+Mirage 2000,air_combat,Multirole fighter,air-combat,4th,FRA,,1984,300
+Mirage III/V,air_combat,Fighter-bomber,air-combat,3rd,FRA,,1961,230
+IAI Kfir,air_combat,Multirole fighter,air-combat,3rd,ISR,,1975,20
+HAL Tejas,air_combat,Light multirole fighter,air-combat,4th,IND,,2015,31
+Mitsubishi F-2,air_combat,Multirole fighter,air-combat,4th,JPN,,2000,90
+JF-17 Thunder,air_combat,Light multirole fighter,air-combat,4th,PAK,,2007,140
+MiG-21 Fishbed,air_combat,Supersonic fighter,air-combat,3rd,RUS,,1959,200
+MiG-29 Fulcrum,air_combat,Multirole fighter,air-combat,4th,RUS,,1983,788
+Su-27 Flanker,air_combat,Air superiority fighter,air-combat,4th,RUS,,1985,200
+Su-30 Flanker-C,air_combat,Twin-seat multirole fighter,air-combat,4th,RUS,,1996,600
+Su-33 Flanker-D,air_combat,Carrier-based fighter,air-combat,4th,RUS,,1995,17
+Su-34 Fullback,air_combat,Fighter-bomber,air-combat,4th,RUS,,2014,142
+Su-35 Flanker-E,air_combat,Multirole fighter,air-combat,4.5,RUS,,2014,140
+Su-57 Felon,air_combat,Stealth multirole fighter,air-combat,5th,RUS,,2020,24
+Saab JAS 39 Gripen,air_combat,Light multirole fighter,air-combat,4th,SWE,,1996,150
+AIDC F-CK-1 Ching-Kuo,air_combat,Light multirole fighter,air-combat,4th,TAI,,1994,130
+AV-8B Harrier II,air_combat,V/STOL attack fighter,air-combat,4th,USA,,1985,120
+F-14 Tomcat,air_combat,Carrier-based fighter,air-combat,4th,USA,,1974,41
+F-15E Strike Eagle,air_combat,Dual-role strike fighter,air-combat,4th,USA,,1988,500
+F-16 Fighting Falcon,air_combat,Light multirole fighter,air-combat,4th,USA,,1980,2084
+F-22 Raptor,air_combat,Stealth air superiority fighter,air-combat,5th,USA,f-22-raptor,2005,178
+F-35 Lightning II,air_combat,Stealth multirole fighter,air-combat,5th,USA,,2015,712
+F-4 Phantom II,air_combat,Multirole fighter-bomber,air-combat,3rd,USA,,1960,113
+F-5 Tiger II,air_combat,Light fighter,air-combat,3rd,USA,,1964,200
+F/A-18 Hornet,air_combat,Carrier-based multirole fighter,air-combat,4th,USA,,1983,250
+F/A-18E/F Super Hornet,air_combat,Carrier-based multirole fighter,air-combat,4.5,USA,,2001,550
+Type 99,main_battle_tank,MBT (ZTZ99),main-battle-tank-guide,3rd,CHN,,2001,600
+Type 99A,main_battle_tank,MBT (ZTZ99A),main-battle-tank-guide,3rd,CHN,,2011,600
+VT-4 (MBT-3000),main_battle_tank,MBT (exp.),main-battle-tank-guide,3rd,CHN,,2017,234
+Leopard 2,main_battle_tank,MBT,main-battle-tank-guide,3rd,DEU,,1979,2500
+Ramses II,main_battle_tank,Upg. MBT (T-54/55),main-battle-tank-guide,2nd,EGY,,2004,840
+Leclerc,main_battle_tank,MBT (AMX-56),main-battle-tank-guide,3rd,FRA,,1992,627
+Challenger 2,main_battle_tank,MBT,main-battle-tank-guide,3rd,GBR,,1998,196
+Merkava Mk.IV,main_battle_tank,MBT,main-battle-tank-guide,3rd,ISR,,2004,660
+Arjun,main_battle_tank,MBT (Mk.1/Mk.1A),main-battle-tank-guide,3rd,IND,,2004,140
+Karrar,main_battle_tank,MBT (indig.),main-battle-tank-guide,3rd,IND,,2017,420
+Ariete,main_battle_tank,MBT (C1),main-battle-tank-guide,3rd,ITA,,1995,150
+Type 10,main_battle_tank,MBT,main-battle-tank-guide,4th,JPN,,2012,106
+Type 90,main_battle_tank,MBT,main-battle-tank-guide,3rd,JPN,,1990,341
+K1A1/A2,main_battle_tank,MBT (120 mm armmt.),main-battle-tank-guide,3rd,KOR,,1999,484
+K2 Black Panther,main_battle_tank,MBT (advanced),main-battle-tank-guide,4th,KOR,,2014,252
+Al-Khalid,main_battle_tank,MBT (MBT-2000 var.),main-battle-tank-guide,3rd,PAK,,2001,600
+Al-Zarrar,main_battle_tank,Upg. MBT (Type 59 retro.),main-battle-tank-guide,2nd,PAK,,2004,750
+Type 85-IIAP,main_battle_tank,MBT (lic. built),main-battle-tank-guide,3rd,PAK,,1992,410
+PT-91 Twardy,main_battle_tank,MBT (T-72M upgrade),main-battle-tank-guide,3rd,POL,,1995,172
+T-55,main_battle_tank,MBT (med.),main-battle-tank-guide,1st,RUS,,1948,3500
+T-62,main_battle_tank,MBT,main-battle-tank-guide,2nd,RUS,,1961,2000
+T-64,main_battle_tank,MBT,main-battle-tank-guide,2nd,RUS,,1966,1000
+T-72,main_battle_tank,MBT,main-battle-tank-guide,2nd,RUS,,1973,8000
+T-80,main_battle_tank,MBT,main-battle-tank-guide,3rd,RUS,,1976,500
+T-90,main_battle_tank,MBT,main-battle-tank-guide,3rd,RUS,,1992,3000
+Altay,main_battle_tank,MBT (indig.),main-battle-tank-guide,3rd,TUR,,2023,7
+M1 Abrams,main_battle_tank,MBT,main-battle-tank-guide,3rd,USA,,1980,4500
+CAIC Z-10,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,CHN,,2009,120
+Harbin Z-19,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,CHN,,2012,186
+Eurocopter Tiger EC665,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,FRA,,2003,180
+HAL Prachand,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,IND,,2022,15
+HAL Rudra,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,IND,,2012,75
+Panha 2091 Toufan,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,IND,,1998,20
+Agusta A129 Mangusta,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,ITA,,1990,45
+Leonardo AW249 Fenice,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,ITA,,2027,0
+KAI LAH,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,KOR,,2024,0
+Kamov Ka-50 Black Shark,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,RUS,,1995,10
+Kamov Ka-52 Alligator,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,RUS,,2011,164
+Mil Mi-24 Hind,attack_helicopter,Attack Helicopter,attack-helicopter-guide,1st,RUS,,1972,1000
+Mil Mi-28 Havoc,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,RUS,,2009,190
+TAI T929 ATAK 2,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,TUR,,2025,0
+TAI/AgustaWestland T129 ATAK,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,TUR,,2014,80
+Bell 360 Invictus,attack_helicopter,Attack Helicopter,attack-helicopter-guide,5th,USA,,2028,0
+Bell AH-1 Cobra,attack_helicopter,Attack Helicopter,attack-helicopter-guide,1st,USA,,1967,100
+Bell AH-1W SuperCobra,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,USA,,1986,120
+Bell AH-1Z Viper,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,USA,,2010,180
+Boeing AH-64 Apache,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,USA,,1986,1200
+Sikorsky Raider X,attack_helicopter,Attack Helicopter,attack-helicopter-guide,5th,USA,,2028,0
+Denel Rooivalk AH-2,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,ZAF,,2011,12

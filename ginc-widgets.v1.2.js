@@ -554,7 +554,7 @@
   }
 
   // ====== NEW: Assets renderer ======
-  function renderAssetsTable(mount, assets, geoIdx, category, isoFilter) {
+function renderAssetsTable(mount, assets, geoIdx, category, isoFilter) {
   if (!assets || !assets.length) return renderError(mount, "No data found in ginc-assets.csv.");
 
   const s = assets[0];
@@ -565,7 +565,8 @@
   const typeK       = pickKey(s, ["asset_type","type"]);
   const volK        = pickKey(s, ["asset_volume","total","count","quantity"]);
   const categoryK   = pickKey(s, ["asset_category","category"]);
-  const profileK    = pickKey(s, ["profile_url","asset_url","url","profile"]); // NEW
+  const profileK    = pickKey(s, ["profile_url","asset_url","url","profile"]);      // (existing) link for Name
+  const typeUrlK    = pickKey(s, ["asset_type_url","type_url","category_url"]);     // NEW: link for Type
 
   if (!isoK || !nameK || !serviceK) {
     return renderError(mount, "ginc-assets.csv missing required columns.");
@@ -573,12 +574,8 @@
 
   // Apply filters
   let rows = assets.slice();
-  if (category && categoryK) {
-    rows = rows.filter(r => slug(r[categoryK]||"") === slug(category));
-  }
-  if (isoFilter && isoK) {
-    rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
-  }
+  if (category && categoryK) rows = rows.filter(r => slug(r[categoryK]||"") === slug(category));
+  if (isoFilter && isoK) rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
 
   // Sort by asset_in_service (desc)
   rows.sort((a,b) => {
@@ -596,11 +593,8 @@
   // Caption & table
   const caption = document.createElement("div");
   caption.className = "ginc-cap-caption";
-  const capBits = [];
-  capBits.push("Assets");
-  if (category) capBits.push(`Category: ${category}`);
-  if (isoFilter) capBits.push(`ISO: ${isoFilter}`);
-  caption.textContent = capBits.join(" — ");
+  caption.textContent = ["Assets", category ? `Category: ${category}` : "", isoFilter ? `ISO: ${isoFilter}` : ""]
+    .filter(Boolean).join(" — ");
 
   const cols = [
     { key:"name", header:"Name" },
@@ -615,19 +609,16 @@
   rows.forEach(r => {
     const tr = document.createElement("tr");
 
+    // Name = emoji (from geo via country_iso) + asset_name; only NAME is linked when profile_url present
     const iso = (r[isoK]||"").trim().toUpperCase();
     const geoRow = geoIdx.byIso[iso];
     const emoji = geoRow ? (geoRow[geoIdx.keys.emojiK] || "") : "";
     const nameText = (r[nameK] || "").trim();
-
     const tdName = document.createElement("td");
     const relProfile = profileK ? (r[profileK] || "").trim().replace(/^\//, "") : "";
-    if (relProfile) {
-      // emoji is NOT part of the link; only the name is linked root-relative
-      tdName.innerHTML = `${emoji ? escapeHTML(emoji) + " " : ""}<a href="/${escapeHTML(relProfile)}">${escapeHTML(nameText)}</a>`;
-    } else {
-      tdName.innerHTML = `${emoji ? escapeHTML(emoji) + " " : ""}${escapeHTML(nameText)}`;
-    }
+    tdName.innerHTML = relProfile
+      ? `${emoji ? escapeHTML(emoji) + " " : ""}<a href="/${escapeHTML(relProfile)}">${escapeHTML(nameText)}</a>`
+      : `${emoji ? escapeHTML(emoji) + " " : ""}${escapeHTML(nameText)}`;
 
     const tdGen = document.createElement("td");
     tdGen.textContent = r[genK] || "";
@@ -635,8 +626,13 @@
     const tdSvc = document.createElement("td");
     tdSvc.textContent = r[serviceK] || "";
 
+    // Type: link to asset_type_url if present (root-relative)
     const tdType = document.createElement("td");
-    tdType.textContent = r[typeK] || "";
+    const typeText = (r[typeK] || "").trim();
+    const relTypeUrl = typeUrlK ? (r[typeUrlK] || "").trim().replace(/^\//, "") : "";
+    tdType.innerHTML = relTypeUrl
+      ? `<a href="/${escapeHTML(relTypeUrl)}">${escapeHTML(typeText)}</a>`
+      : escapeHTML(typeText);
 
     const tdVol = document.createElement("td");
     tdVol.textContent = r[volK] || "";

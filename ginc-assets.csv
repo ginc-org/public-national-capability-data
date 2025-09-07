@@ -92,7 +92,7 @@ Tu-22M3 Backfire,strategic_strike,Nuclear strike bomber,air-strike,3rd,RUS,,1983
 Xian H-6,strategic_strike,Nuclear bomber,air-strike,2nd,CHN,,1969,120
 Tu-95 Bear,strategic_strike,Turboprop nuclear bomber,air-strike,2nd,RUS,,1956,55
 B-52 Stratofortress,strategic_strike,Nuclear bomber,air-strike,2nd,USA,,1955,76
-Hai Kun-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,TWN,,2025,1
+Hai Kun-class,submarines,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,TWN,,2025,1
 Collins-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,3rd,AUS,,1996,6
 Han-class,submarine,Nuclear,submarines-and-sub-surface-platforms,1st,CHN,,1974,3
 Song-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,2nd,CHN,,1998,13
@@ -164,19 +164,19 @@ DefendTex Drone40,drones,Micro loitering munition (grenade UAV),uavs-and-drones,
 Watchkeeper WK450,drones,Tactical ISR UAV (twin-boom),uavs-and-drones,4th,GBR,,2014,54
 Dassault nEUROn,drones,Stealth UCAV demonstrator,uavs-and-drones,5th,FRA,,2012,1
 Eurodrone (MALE UAS),drones,Twin-engined MALE UAV (multinational),uavs-and-drones,4th,EUR,,2027,0
-Nimitz-class (CVN-68 to CVN-77),naval_carrier,CATOBAR supercarrier (nuclear),naval-carrier,,USA,,1975,10
-Gerald R. Ford-class (CVN-78),naval_carrier,CATOBAR supercarrier (nuclear),naval-carrier,,USA,,2017,1
-America-class LHA (LHA-6/7),naval_carrier,Amphibious assault ship / aviation (STOVL/rotary),naval-carrier,,USA,,2014,2
-Wasp-class LHD,naval_carrier,Amphibious assault ship / aviation (STOVL/rotary),naval-carrier,,USA,,1989,7
-"Liaoning (Type 001, CV-16)",naval_carrier,STOBAR aircraft carrier,naval-carrier,,CHN,,2012,1
-"Shandong (Type 002, CV-17)",naval_carrier,STOBAR aircraft carrier,naval-carrier,,CHN,,2019,1
-Type 075 (Yushen-class) LHD,naval_carrier,Amphibious assault ship / helicopter carrier (rotary),naval-carrier,,CHN,,2021,4
-"Fujian (Type 003, CV-18)",naval_carrier,CATOBAR aircraft carrier (EMALS),naval-carrier,,CHN,,2025,0
-Queen Elizabeth-class (R08/R09),naval_carrier,STOVL aircraft carrier,naval-carrier,,GBR,,2017,2
-Charles de Gaulle (R91),naval_carrier,CATOBAR aircraft carrier (nuclear),naval-carrier,,FRA,,2001,1
-PANG (Porte-avions de nouvelle génération),naval_carrier,"Next-gen CATOBAR (EMALS/AAG), nuclear",naval-carrier,,FRA,,2038,0
-Canberra-class LHD (L01/L02),naval_carrier,Amphibious assault ship / helicopter carrier (rotary),naval-carrier,,AUS,,2014,2
-Admiral Kuznetsov — non-operational,naval_carrier,STOBAR aircraft carrier,naval-carrier,,RUS,,1991,0
-IRIS Makran,naval_carrier,Forward base / helicopter & UAV carrier (converted tanker),naval-carrier,,IRN,,2021,1
-IRIS Shahid Mahdavi (110-3),naval_carrier,“Drone carrier” / expeditionary sea base (converted container ship),naval-carrier,,IRN,,2023,1
-IRIS Shahid Bagheri (C110-4),naval_carrier,“Drone carrier” with angled deck/ski-jump (converted container ship),naval-carrier,,IRN,,2025,1
+Nimitz-class (CVN-68 to CVN-77),aircraft_carriers,CATOBAR supercarrier (nuclear),naval-carrier,,USA,,1975,10
+Gerald R. Ford-class (CVN-78),aircraft_carriers,CATOBAR supercarrier (nuclear),naval-carrier,,USA,,2017,1
+America-class LHA (LHA-6/7),aircraft_carriers,Amphibious assault ship / aviation (STOVL/rotary),naval-carrier,,USA,,2014,2
+Wasp-class LHD,aircraft_carriers,Amphibious assault ship / aviation (STOVL/rotary),naval-carrier,,USA,,1989,7
+"Liaoning (Type 001, CV-16)",aircraft_carriers,STOBAR aircraft carrier,naval-carrier,,CHN,,2012,1
+"Shandong (Type 002, CV-17)",aircraft_carriers,STOBAR aircraft carrier,naval-carrier,,CHN,,2019,1
+Type 075 (Yushen-class) LHD,aircraft_carriers,Amphibious assault ship / helicopter carrier (rotary),naval-carrier,,CHN,,2021,4
+"Fujian (Type 003, CV-18)",aircraft_carriers,CATOBAR aircraft carrier (EMALS),naval-carrier,,CHN,,2025,0
+Queen Elizabeth-class (R08/R09),aircraft_carriers,STOVL aircraft carrier,naval-carrier,,GBR,,2017,2
+Charles de Gaulle (R91),aircraft_carriers,CATOBAR aircraft carrier (nuclear),naval-carrier,,FRA,,2001,1
+PANG (Porte-avions de nouvelle génération),aircraft_carriers,"Next-gen CATOBAR (EMALS/AAG), nuclear",naval-carrier,,FRA,,2038,0
+Canberra-class LHD (L01/L02),aircraft_carriers,Amphibious assault ship / helicopter carrier (rotary),naval-carrier,,AUS,,2014,2
+Admiral Kuznetsov — non-operational,aircraft_carriers,STOBAR aircraft carrier,naval-carrier,,RUS,,1991,0
+IRIS Makran,aircraft_carriers,Forward base / helicopter & UAV carrier (converted tanker),naval-carrier,,IRN,,2021,1
+IRIS Shahid Mahdavi (110-3),aircraft_carriers,“Drone carrier” / expeditionary sea base (converted container ship),naval-carrier,,IRN,,2023,1
+IRIS Shahid Bagheri (C110-4),aircraft_carriers,“Drone carrier” with angled deck/ski-jump (converted container ship),naval-carrier,,IRN,,2025,1

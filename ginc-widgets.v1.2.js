@@ -343,9 +343,6 @@
     const geoRow = geoIdx.byIso[iso];
     if (!geoRow) return renderError(mount, `Unknown ISO code: ${iso}`);
 
-    const caption = document.createElement("div");
-    caption.className = "ginc-cap-caption";
-    caption.innerHTML = `National Capability Ratings — ${escapeHTML(geoRow[geoIdx.keys.nameK]||iso)}`;
     const cols = [
       { key:"component", header:"Index Component" },
       { key:"rating",    header:"Rating" },
@@ -409,8 +406,8 @@
     mount.innerHTML = "";
     const wrap = document.createElement("div");
     wrap.className = "ginc-cap-wrap";
-    wrap.appendChild(caption);
     wrap.appendChild(table);
+    appendSourceAfter(wrap);   // ← NEW: adds “Source. … {year}”
     mount.appendChild(wrap);
   }
 
@@ -424,10 +421,6 @@
       ensureDomain("soft-power",     "Soft Power"),
       ensureDomain("economic-power", "Economic Power")
     ];
-
-    const caption = document.createElement("div");
-    caption.className = "ginc-cap-caption";
-    caption.textContent = "Overall — Domain Ratings";
 
     const cols = [
       { key:"country", header:"Country" },
@@ -479,18 +472,14 @@
     mount.innerHTML = "";
     const wrap = document.createElement("div");
     wrap.className = "ginc-cap-wrap";
-    wrap.appendChild(caption);
     wrap.appendChild(table);
+    appendSourceAfter(wrap);   // ← NEW: adds “Source. … {year}”
     mount.appendChild(wrap);
   }
 
   function renderOneLevelTable(mount, level, focusSlug, ratingsIdx, geoIdx, filters) {
     if (!focusSlug) return renderError(mount, `Missing required attribute: data-focus for ${level} table.`);
     const focusId = slug(focusSlug);
-
-    const caption = document.createElement("div");
-    caption.className = "ginc-cap-caption";
-    caption.textContent = `${titleize(level)} — ${titleize(focusId)}`;
 
     const cols = [
       { key:"country", header:"Country" },
@@ -544,8 +533,8 @@
     mount.innerHTML = "";
     const wrap = document.createElement("div");
     wrap.className = "ginc-cap-wrap";
-    wrap.appendChild(caption);
     wrap.appendChild(table);
+    appendSourceAfter(wrap);   // ← NEW: adds “Source. … {year}”
     mount.appendChild(wrap);
   }
 
@@ -584,10 +573,6 @@
       return 0;
     });
 
-    const caption = document.createElement("div");
-    caption.className = "ginc-cap-caption";
-    caption.textContent = ["Assets", category ? `Category: ${category}` : "", isoFilter ? `ISO: ${isoFilter}` : ""]
-      .filter(Boolean).join(" — ");
 
     const cols = [
       { key:"name", header:"Name" },
@@ -638,8 +623,8 @@
     mount.innerHTML = "";
     const wrap = document.createElement("div");
     wrap.className = "ginc-cap-wrap";
-    wrap.appendChild(caption);
     wrap.appendChild(table);
+    appendSourceAfter(wrap);   // ← NEW: adds “Source. … {year}”
     mount.appendChild(wrap);
   }
 
@@ -677,10 +662,6 @@
       return an.localeCompare(bn, undefined, { sensitivity:"base" });
     });
 
-    const caption = document.createElement("div");
-    caption.className = "ginc-cap-caption";
-    caption.textContent = ["Organizations", category ? `Category: ${category}` : "", isoFilter ? `ISO: ${isoFilter}` : ""]
-      .filter(Boolean).join(" — ");
 
     const cols = [
       { key:"name", header:"Name" },
@@ -725,8 +706,8 @@
     mount.innerHTML = "";
     const wrap = document.createElement("div");
     wrap.className = "ginc-cap-wrap";
-    wrap.appendChild(caption);
     wrap.appendChild(table);
+    appendSourceAfter(wrap);   // ← NEW: adds “Source. … {year}”
     mount.appendChild(wrap);
   }
 
@@ -767,6 +748,15 @@
       renderError(el, err.message || String(err));
     }
   }
+
+
+  function appendSourceAfter(parentEl){
+    const src = document.createElement("div");
+    src.className = "ginc-cap-source";
+    src.textContent = `Source. Global Institute of National Capability (GINC), ${new Date().getFullYear()}`;
+    parentEl.appendChild(src);
+  }
+
 
   // ====== Boot ======
   async function initAll() {

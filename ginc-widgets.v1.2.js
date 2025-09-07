@@ -610,7 +610,13 @@
       tdSvc.textContent = r[serviceK] || "";
 
       const tdVol = document.createElement("td");
-      tdVol.textContent = r[volK] || "";
+      const rawVol = (r[volK] ?? "").trim();
+      if (rawVol === "") {
+        tdVol.textContent = "-";
+      } else {
+        const n = safeNum(rawVol);
+        tdVol.textContent = Number.isFinite(n) ? (n > 0 ? String(n) : "-") : rawVol; // keep non-numeric text as-is
+      }
 
       tr.appendChild(tdName);
       tr.appendChild(tdType);

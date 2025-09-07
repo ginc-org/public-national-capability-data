@@ -171,12 +171,12 @@ Wasp-class LHD,naval_carrier,Amphibious assault ship / aviation (STOVL/rotary),n
 "Liaoning (Type 001, CV-16)",naval_carrier,STOBAR aircraft carrier,naval-carrier,,CHN,,2012,1
 "Shandong (Type 002, CV-17)",naval_carrier,STOBAR aircraft carrier,naval-carrier,,CHN,,2019,1
 Type 075 (Yushen-class) LHD,naval_carrier,Amphibious assault ship / helicopter carrier (rotary),naval-carrier,,CHN,,2021,4
-"Fujian (Type 003, CV-18) — commissioning/entry to service expected 2025",naval_carrier,CATOBAR aircraft carrier (EMALS),naval-carrier,,CHN,,2025,0
+"Fujian (Type 003, CV-18)",naval_carrier,CATOBAR aircraft carrier (EMALS),naval-carrier,,CHN,,2025,0
 Queen Elizabeth-class (R08/R09),naval_carrier,STOVL aircraft carrier,naval-carrier,,GBR,,2017,2
 Charles de Gaulle (R91),naval_carrier,CATOBAR aircraft carrier (nuclear),naval-carrier,,FRA,,2001,1
-PANG (Porte-avions de nouvelle génération) — under development,naval_carrier,"Next-gen CATOBAR (EMALS/AAG), nuclear",naval-carrier,,FRA,,2038,0
+PANG (Porte-avions de nouvelle génération),naval_carrier,"Next-gen CATOBAR (EMALS/AAG), nuclear",naval-carrier,,FRA,,2038,0
 Canberra-class LHD (L01/L02),naval_carrier,Amphibious assault ship / helicopter carrier (rotary),naval-carrier,,AUS,,2014,2
-Admiral Kuznetsov — non-operational (long-term refit; likely retirement),naval_carrier,STOBAR aircraft carrier,naval-carrier,,RUS,,1991,0
+Admiral Kuznetsov — non-operational,naval_carrier,STOBAR aircraft carrier,naval-carrier,,RUS,,1991,0
 IRIS Makran,naval_carrier,Forward base / helicopter & UAV carrier (converted tanker),naval-carrier,,IRN,,2021,1
 IRIS Shahid Mahdavi (110-3),naval_carrier,“Drone carrier” / expeditionary sea base (converted container ship),naval-carrier,,IRN,,2023,1
 IRIS Shahid Bagheri (C110-4),naval_carrier,“Drone carrier” with angled deck/ski-jump (converted container ship),naval-carrier,,IRN,,2025,1

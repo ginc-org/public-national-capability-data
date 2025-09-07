@@ -17,7 +17,7 @@
       .ginc-cap-wrap { width:100%; }
       .ginc-cap-caption { margin:6px 0 12px; color:#666; font-size:.9rem; }
       .ginc-cap-table { width:100%; border-collapse:collapse; font-size:1.5rem; }
-      .ginc-cap-table th, .ginc-cap-table td { padding:8px 10px; vertical-align:top; text-align:left; }
+      .ginc-cap-table th, .ginc-cap-table td { padding:8px 10px 8px 0; vertical-align:top; text-align:left; }
       .ginc-cap-table thead th { font-weight:600; }
       .ginc-cap-error { color:#b00020; padding:6px 0; }
       /* Country view hierarchy (no extra left indentation for subdomain/pillar) */

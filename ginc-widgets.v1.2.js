@@ -578,8 +578,8 @@
       { key:"name", header:"Name" },
       { key:"type", header:"Type" },
       { key:"gen",  header:"Gen" },
-      { key:"svc",  header:"Service" },
-      { key:"vol",  header:"Total" }
+      { key:"svc",  header:"In Service" },
+      { key:"vol",  header:"Estimate" }
     ];
     const { table, tbody } = mkTable(cols);
 

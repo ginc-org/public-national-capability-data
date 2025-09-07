@@ -82,3 +82,101 @@ Bell AH-1Z Viper,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th
 Boeing AH-64 Apache,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,USA,,1986,1200
 Sikorsky Raider X,attack_helicopter,Attack Helicopter,attack-helicopter-guide,5th,USA,,2028,0
 Denel Rooivalk AH-2,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,ZAF,,2011,12
+B-21 Raider,strategic_strike,Stealth nuclear bomber,air-strike,6th,USA,,2027,100
+Xian H-20,strategic_strike,Stealth nuclear bomber,air-strike,6th,CHN,,2027,50
+PAK DA,strategic_strike,Stealth nuclear bomber,air-strike,6th,RUS,,2027,
+B-2 Spirit,strategic_strike,Stealth nuclear bomber,air-strike,5th,USA,,1997,20
+Tu-160 Blackjack,strategic_strike,Supersonic nuclear bomber,air-strike,4th,RUS,,1987,14
+B-1B Lancer,strategic_strike,Supersonic bomber,air-strike,4th,USA,,1986,45
+Tu-22M3 Backfire,strategic_strike,Nuclear strike bomber,air-strike,3rd,RUS,,1983,40
+Xian H-6,strategic_strike,Nuclear bomber,air-strike,2nd,CHN,,1969,120
+Tu-95 Bear,strategic_strike,Turboprop nuclear bomber,air-strike,2nd,RUS,,1956,55
+B-52 Stratofortress,strategic_strike,Nuclear bomber,air-strike,2nd,USA,,1955,76
+Hai Kun-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,TWN,,2025,1
+Collins-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,3rd,AUS,,1996,6
+Han-class,submarine,Nuclear,submarines-and-sub-surface-platforms,1st,CHN,,1974,3
+Song-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,2nd,CHN,,1998,13
+Xia-class,submarine,Nuclear,submarines-and-sub-surface-platforms,1st,CHN,,1987,1
+Yuan-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,3rd,CHN,,2006,20
+Type 212,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,DEU,,2005,10
+Type 214,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,DEU,,2007,15
+S-80 Plus-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,ESP,,2023,1
+Barracuda-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,FRA,,2020,3
+Triomphant-class,submarine,Nuclear,submarines-and-sub-surface-platforms,2nd,FRA,,1997,4
+Astute-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,GBR,,2010,5
+Trafalgar-class,submarine,Nuclear,submarines-and-sub-surface-platforms,3rd,GBR,,1983,6
+Vanguard-class,submarine,Nuclear,submarines-and-sub-surface-platforms,2nd,GBR,,1994,4
+Arihant-class,submarine,Nuclear,submarines-and-sub-surface-platforms,1st,IND,,2016,3
+Oyashio-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,3rd,JPN,,1998,11
+Sōryū-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,JPN,,2009,12
+Taigei-class,submarine,"Diesel-electric, Lithium-ion",submarines-and-sub-surface-platforms,4th,JPN,,2022,1
+Akula-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,RUS,,1984,4
+Belgorod,submarine,Special mission submarine (Nuclear),submarines-and-sub-surface-platforms,4th,RUS,,2022,1
+Borei-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,RUS,,2013,7
+Delta-class,submarine,Nuclear,submarines-and-sub-surface-platforms,2nd,RUS,,1984,8
+Kilo-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,3rd,RUS,,1982,50
+Oscar-class,submarine,Nuclear,submarines-and-sub-surface-platforms,3rd,RUS,,1986,8
+Typhoon-class,submarine,Nuclear,submarines-and-sub-surface-platforms,3rd,RUS,,1981,1
+Yasen-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,RUS,,2013,4
+Gotland-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,3rd,SWE,,1996,3
+Los Angeles-class,submarine,Nuclear,submarines-and-sub-surface-platforms,3rd,USA,,1976,24
+Ohio-class (SSGN),submarine,Nuclear (SSGN),submarines-and-sub-surface-platforms,3rd,USA,,2006,4
+Seawolf-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,USA,,1997,3
+Virginia-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,USA,,2004,22
+MQ-9 Reaper,drones,MALE UCAV (strike/recon),uavs-and-drones,4th,USA,,2007,300
+MQ-1 Predator,drones,MALE UAV (strike/recon),uavs-and-drones,4th,USA,,1995,360
+MQ-1C Gray Eagle,drones,MALE UAV (strike/recon),uavs-and-drones,4th,USA,,2009,204
+RQ-4 Global Hawk,drones,HALE reconnaissance UAV,uavs-and-drones,4th,USA,,2001,42
+RQ-7 Shadow,drones,Tactical reconnaissance UAV,uavs-and-drones,4th,USA,,2002,500
+RQ-11 Raven,drones,Man-portable SUAV,uavs-and-drones,4th,USA,,2003,19000
+RQ-170 Sentinel,drones,Stealth ISR UAV,uavs-and-drones,5th,USA,,2007,20
+MQ-25 Stingray,drones,Carrier-based tanker UAV,uavs-and-drones,5th,USA,,2025,7
+Wing Loong I,drones,MALE UAV (strike/recon),uavs-and-drones,4th,CHN,,2014,50
+Wing Loong II,drones,MALE UAV (strike/recon),uavs-and-drones,4th,CHN,,2017,50
+CASC CH-4,drones,MALE UCAV (strike/recon),uavs-and-drones,4th,CHN,,2014,30
+CASC CH-5,drones,MALE UCAV (strike/recon),uavs-and-drones,4th,CHN,,2017,10
+CASC CH-7,drones,HALE stealth UCAV,uavs-and-drones,5th,CHN,,2025,0
+CASIC WZ-8,drones,Supersonic ISR drone,uavs-and-drones,5th,CHN,,2019,2
+AVIC Soar Dragon (WZ-7),drones,HALE reconnaissance UAV,uavs-and-drones,4th,CHN,,2018,6
+Harbin BZK-005,drones,MALE reconnaissance UAV,uavs-and-drones,4th,CHN,,2006,10
+GJ-11 Sharp Sword,drones,Stealth combat drone (UCAV),uavs-and-drones,5th,CHN,,2019,2
+IAI Heron Mk.1,drones,MALE reconnaissance UAV,uavs-and-drones,4th,ISR,,2000,100
+IAI Heron TP (Eitan),drones,HALE UCAV (strike/recon),uavs-and-drones,5th,ISR,,2010,15
+Elbit Hermes 450,drones,Tactical reconnaissance UAV,uavs-and-drones,4th,ISR,,1998,100
+Elbit Hermes 900,drones,MALE UCAV (strike/recon),uavs-and-drones,4th,ISR,,2012,50
+IAI Searcher MkII,drones,Tactical reconnaissance UAV,uavs-and-drones,3rd,ISR,,1998,100
+IAI Harpy,drones,Anti-radar loitering drone (SEAD),uavs-and-drones,3rd,ISR,,1994,100
+IAI Harop,drones,Long-endurance loitering munition,uavs-and-drones,4th,ISR,,2009,20
+Bayraktar TB2,drones,MALE UCAV (strike/recon),uavs-and-drones,4th,TUR,,2014,580
+Bayraktar Akıncı,drones,HALE UCAV (strike/recon),uavs-and-drones,4th,TUR,,2021,12
+TAI Anka-S,drones,MALE UCAV (strike/recon),uavs-and-drones,4th,TUR,,2017,50
+Bayraktar Kızılelma,drones,Jet-powered stealth UCAV,uavs-and-drones,5th,TUR,,2024,0
+Orlan-10,drones,Small tactical ISR UAV,uavs-and-drones,4th,RUS,,2010,1000
+Forpost (Searcher II),drones,Tactical reconnaissance UAV,uavs-and-drones,4th,RUS,,2014,100
+Kronshtadt Orion,drones,MALE UCAV (strike/recon),uavs-and-drones,4th,RUS,,2020,30
+ZALA Lancet,drones,One-way attack drone (kamikaze),uavs-and-drones,4th,RUS,,2019,100
+ZALA KUB (KYB),drones,One-way attack drone (kamikaze),uavs-and-drones,4th,RUS,,2019,50
+S-70 Okhotnik,drones,Stealth heavy combat drone,uavs-and-drones,5th,RUS,,2024,0
+Tu-141 Strizh,drones,Reconnaissance drone (legacy),uavs-and-drones,3rd,UKR,,1979,152
+PD-2 (Punisher UAV),drones,Small strike/recon UAV,uavs-and-drones,4th,UKR,,2016,10
+MQ-28 Ghost Bat,drones,Loyal wingman stealth UAV,uavs-and-drones,5th,AUS,,2023,0
+DefendTex Drone40,drones,Micro loitering munition (grenade UAV),uavs-and-drones,4th,AUS,,2018,300
+Watchkeeper WK450,drones,Tactical ISR UAV (twin-boom),uavs-and-drones,4th,GBR,,2014,54
+Dassault nEUROn,drones,Stealth UCAV demonstrator,uavs-and-drones,5th,FRA,,2012,1
+Eurodrone (MALE UAS),drones,Twin-engined MALE UAV (multinational),uavs-and-drones,4th,EUR,,2027,0
+Nimitz-class (CVN-68 to CVN-77),naval_carrier,CATOBAR supercarrier (nuclear),naval-carrier,,USA,,1975,10
+Gerald R. Ford-class (CVN-78),naval_carrier,CATOBAR supercarrier (nuclear),naval-carrier,,USA,,2017,1
+America-class LHA (LHA-6/7),naval_carrier,Amphibious assault ship / aviation (STOVL/rotary),naval-carrier,,USA,,2014,2
+Wasp-class LHD,naval_carrier,Amphibious assault ship / aviation (STOVL/rotary),naval-carrier,,USA,,1989,7
+"Liaoning (Type 001, CV-16)",naval_carrier,STOBAR aircraft carrier,naval-carrier,,CHN,,2012,1
+"Shandong (Type 002, CV-17)",naval_carrier,STOBAR aircraft carrier,naval-carrier,,CHN,,2019,1
+Type 075 (Yushen-class) LHD,naval_carrier,Amphibious assault ship / helicopter carrier (rotary),naval-carrier,,CHN,,2021,4
+"Fujian (Type 003, CV-18) — commissioning/entry to service expected 2025",naval_carrier,CATOBAR aircraft carrier (EMALS),naval-carrier,,CHN,,2025,0
+Queen Elizabeth-class (R08/R09),naval_carrier,STOVL aircraft carrier,naval-carrier,,GBR,,2017,2
+Charles de Gaulle (R91),naval_carrier,CATOBAR aircraft carrier (nuclear),naval-carrier,,FRA,,2001,1
+PANG (Porte-avions de nouvelle génération) — under development,naval_carrier,"Next-gen CATOBAR (EMALS/AAG), nuclear",naval-carrier,,FRA,,2038,0
+Canberra-class LHD (L01/L02),naval_carrier,Amphibious assault ship / helicopter carrier (rotary),naval-carrier,,AUS,,2014,2
+Admiral Kuznetsov — non-operational (long-term refit; likely retirement),naval_carrier,STOBAR aircraft carrier,naval-carrier,,RUS,,1991,0
+IRIS Makran,naval_carrier,Forward base / helicopter & UAV carrier (converted tanker),naval-carrier,,IRN,,2021,1
+IRIS Shahid Mahdavi (110-3),naval_carrier,“Drone carrier” / expeditionary sea base (converted container ship),naval-carrier,,IRN,,2023,1
+IRIS Shahid Bagheri (C110-4),naval_carrier,“Drone carrier” with angled deck/ski-jump (converted container ship),naval-carrier,,IRN,,2025,1

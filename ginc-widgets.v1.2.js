@@ -24,7 +24,10 @@
       .ginc-row--domain    td:first-child { font-weight:700; padding-top:14px; }
       .ginc-row--subdomain td:first-child { font-weight:600; }
       .ginc-row--pillar td:first-child {}
-      .ginc-row--pillar td { border-bottom:1px solid rgba(0,0,0,.06); }
+      /* Generic row separators for all tables;
+         turn OFF when a row is explicitly colored */
+      .ginc-cap-table tbody tr td { border-bottom:1px solid rgba(0,0,0,.06); }
+      .ginc-cap-table tbody tr.ginc-colored td { border-bottom:none; }
       /* Rating separator row for domain/subdomain/pillar tables */
       .ginc-cap-sep td { background:#f2f2f2; font-weight:700; padding:10px; }
     `;
@@ -126,7 +129,7 @@
     const isoK       = pickKey(s, ["country_iso","iso3","iso_a3","iso_alpha3","iso","alpha3"]);
     const nameK      = pickKey(s, ["country_name","name","country"]);
     const emojiK     = pickKey(s, ["country_emoji","emoji"]);
-    const urlK       = pickKey(s, ["country_url","path","url"]);  // relative path
+    const urlK       = pickKey(s, ["country_url","path","url"]);
     const regionK    = pickKey(s, ["region"]);
     const subregionK = pickKey(s, ["sub_region","subregion","sub-region"]);
     const groupK     = pickKey(s, ["groups","group","memberships","membership"]);
@@ -140,7 +143,7 @@
     return { byIso, list: geo, keys:{ isoK,nameK,emojiK,urlK,regionK,subregionK,groupK } };
   }
 
-  // ====== Framework hierarchy (correct *_name, *_url, *_var, and pillar_hex/url) ======
+  // ====== Framework hierarchy ======
   function buildFrameworkHierarchy(fw) {
     if (!fw.length) return { domains: [], keys:{} };
     const s = fw[0];
@@ -159,7 +162,7 @@
     const pillarUrlK  = pickKey(s, ["pillar_url"]);
     let   pillarVarK  = pickKey(s, ["pillar_var"]);
     const pillarOrderK= pickKey(s, ["pillar_order","order_pillar","pillar_sort","order"]);
-    const pillarHexK  = pickKey(s, ["pillar_hex","hex","pillar_color","color","colour","color_hex","colour_hex"]); // prefer pillar_hex
+    const pillarHexK  = pickKey(s, ["pillar_hex","hex","pillar_color","color","colour","color_hex","colour_hex"]);
 
     const getVar = (row, varK, urlK, nameK) => {
       if (varK && row[varK]) return slug(row[varK]);
@@ -197,7 +200,7 @@
       const pVar = getVar(r, pillarVarK, pillarUrlK, pillarNameK);
       if (!pVar) return;
       const pHex = normalizeHex((r[pillarHexK] || "").trim());
-      const pUrl = (r[pillarUrlK] || "").trim(); // store pillar_url for hyperlinking pillar_name
+      const pUrl = (r[pillarUrlK] || "").trim();
       sd.pillars.push({
         slug: pVar,
         name: (r[pillarNameK] || titleize(pVar)),
@@ -220,17 +223,10 @@
         return d;
       });
 
-    return {
-      domains,
-      keys: {
-        domainNameK, domainUrlK, domainVarK, domainOrderK,
-        subNameK, subUrlK, subVarK, subOrderK,
-        pillarNameK, pillarUrlK, pillarVarK, pillarOrderK, pillarHexK
-      }
-    };
+    return { domains, keys:{ domainNameK, domainUrlK, domainVarK, domainOrderK, subNameK, subUrlK, subVarK, subOrderK, pillarNameK, pillarUrlK, pillarVarK, pillarOrderK, pillarHexK } };
   }
 
-  // ====== Ratings index (assessment_type; normalized IDs; dedup) ======
+  // ====== Ratings index ======
   function buildRatingsIndex(ratings) {
     if (!ratings.length) return { by: { domain:new Map(), subdomain:new Map(), pillar:new Map() }, keys:{} };
 
@@ -268,7 +264,6 @@
       const iso = (r[isoK] || "").trim().toUpperCase();
       if (!iso) return;
 
-      // Determine level (explicit or inferred)
       let level = assessK ? ci(r[assessK] || "") : "";
       if (!by[level]) {
         level =
@@ -278,7 +273,6 @@
       }
       if (!by[level]) return;
 
-      // Normalized identifier
       const idRaw =
         level === "pillar"    ? (r[pillarVarK]  || "") :
         level === "subdomain" ? (r[subVarK]     || "") :
@@ -295,7 +289,7 @@
     return { by, keys:{ isoK, assessK, domainVarK, subVarK, pillarVarK, ratingK, scoreK, outlookK, dateK } };
   }
 
-  // ====== Filtering (region / sub_region / groups) ======
+  // ====== Filtering ======
   function countryPassesFilters(geoRow, geoKeys, filters) {
     if (!geoRow) return false;
     const { region, subregion, group } = filters;
@@ -364,10 +358,13 @@
       const tr = document.createElement("tr");
       if (cls) tr.className = cls;
 
-      // For pillar rows, use pillar_hex from framework (p.hex)
+      // For pillar rows, use pillar_hex from framework; mark as colored to suppress separators
       if (cls === "ginc-row--pillar") {
         const bg = normalizeHex(pillarHex);
-        if (bg) tr.setAttribute("style", `background-color:${bg};`);
+        if (bg) {
+          tr.classList.add("ginc-colored");
+          tr.setAttribute("style", `background-color:${bg};`);
+        }
       }
 
       const td0 = document.createElement("td");
@@ -404,7 +401,6 @@
         sd.pillars.forEach(p => {
           const pKey = `${iso}|${slug(p.slug)}`;
           const pRow = ratingsIdx.by.pillar.get(pKey);
-          // Link pillar_name to relative pillar_url
           pushRow("ginc-row--pillar", p.name, pRow, p.hex || "", p.url || "");
         });
       });
@@ -419,7 +415,6 @@
   }
 
   function renderOverallTable(mount, fw, ratingsIdx, geoIdx, filters) {
-    // No rating separators in overall view
     const ensureDomain = (slugStr, fallbackName) => {
       const found = fw.domains.find(d => slug(d.slug)===slug(slugStr));
       return found || { slug: slug(slugStr), name: fallbackName || titleize(slugStr) };
@@ -648,7 +643,7 @@
     mount.appendChild(wrap);
   }
 
-  // ====== NEW: Orgs renderer ======
+  // ====== Orgs renderer ======
   function renderOrgsTable(mount, orgs, geoIdx, category, isoFilter) {
     if (!orgs || !orgs.length) return renderError(mount, "No data found in ginc-orgs.csv.");
 
@@ -665,12 +660,7 @@
       return renderError(mount, "ginc-orgs.csv missing required columns.");
     }
 
-    // Filters
     let rows = orgs.slice();
-     // inside renderOrgsTable, replace:
-    // if (category && categoryK) rows = rows.filter(r => slug(r[categoryK]||"") === slug(category));
-
-    // with pipe-aware matching:
     if (category && categoryK) {
       const needle = slug(category);
       rows = rows.filter(r => {
@@ -679,16 +669,14 @@
         return parts.includes(needle);
       });
     }
-   if (isoFilter && isoK) rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
+    if (isoFilter && isoK) rows = rows.filter(r => (r[isoK]||"").toUpperCase() === isoFilter.toUpperCase());
 
-    // Sort by org_name ascending (alpha)
     rows.sort((a,b) => {
       const an = (a[nameK] || "").trim();
       const bn = (b[nameK] || "").trim();
       return an.localeCompare(bn, undefined, { sensitivity:"base" });
     });
 
-    // Caption & table
     const caption = document.createElement("div");
     caption.className = "ginc-cap-caption";
     caption.textContent = ["Organizations", category ? `Category: ${category}` : "", isoFilter ? `ISO: ${isoFilter}` : ""]

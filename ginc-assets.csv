@@ -93,36 +93,36 @@ Xian H-6,strategic_strike,Nuclear bomber,air-strike,2nd,CHN,,1969,120
 Tu-95 Bear,strategic_strike,Turboprop nuclear bomber,air-strike,2nd,RUS,,1956,55
 B-52 Stratofortress,strategic_strike,Nuclear bomber,air-strike,2nd,USA,,1955,76
 Hai Kun-class,submarines,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,TWN,,2025,1
-Collins-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,3rd,AUS,,1996,6
-Han-class,submarine,Nuclear,submarines-and-sub-surface-platforms,1st,CHN,,1974,3
-Song-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,2nd,CHN,,1998,13
-Xia-class,submarine,Nuclear,submarines-and-sub-surface-platforms,1st,CHN,,1987,1
-Yuan-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,3rd,CHN,,2006,20
-Type 212,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,DEU,,2005,10
-Type 214,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,DEU,,2007,15
-S-80 Plus-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,ESP,,2023,1
-Barracuda-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,FRA,,2020,3
-Triomphant-class,submarine,Nuclear,submarines-and-sub-surface-platforms,2nd,FRA,,1997,4
-Astute-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,GBR,,2010,5
-Trafalgar-class,submarine,Nuclear,submarines-and-sub-surface-platforms,3rd,GBR,,1983,6
-Vanguard-class,submarine,Nuclear,submarines-and-sub-surface-platforms,2nd,GBR,,1994,4
-Arihant-class,submarine,Nuclear,submarines-and-sub-surface-platforms,1st,IND,,2016,3
-Oyashio-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,3rd,JPN,,1998,11
-Sōryū-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,JPN,,2009,12
-Taigei-class,submarine,"Diesel-electric, Lithium-ion",submarines-and-sub-surface-platforms,4th,JPN,,2022,1
-Akula-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,RUS,,1984,4
-Belgorod,submarine,Special mission submarine (Nuclear),submarines-and-sub-surface-platforms,4th,RUS,,2022,1
-Borei-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,RUS,,2013,7
-Delta-class,submarine,Nuclear,submarines-and-sub-surface-platforms,2nd,RUS,,1984,8
-Kilo-class,submarine,Diesel-electric,submarines-and-sub-surface-platforms,3rd,RUS,,1982,50
-Oscar-class,submarine,Nuclear,submarines-and-sub-surface-platforms,3rd,RUS,,1986,8
-Typhoon-class,submarine,Nuclear,submarines-and-sub-surface-platforms,3rd,RUS,,1981,1
-Yasen-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,RUS,,2013,4
-Gotland-class,submarine,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,3rd,SWE,,1996,3
-Los Angeles-class,submarine,Nuclear,submarines-and-sub-surface-platforms,3rd,USA,,1976,24
-Ohio-class (SSGN),submarine,Nuclear (SSGN),submarines-and-sub-surface-platforms,3rd,USA,,2006,4
-Seawolf-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,USA,,1997,3
-Virginia-class,submarine,Nuclear,submarines-and-sub-surface-platforms,4th,USA,,2004,22
+Collins-class,submarines,Diesel-electric,submarines-and-sub-surface-platforms,3rd,AUS,,1996,6
+Han-class,submarines,Nuclear,submarines-and-sub-surface-platforms,1st,CHN,,1974,3
+Song-class,submarines,Diesel-electric,submarines-and-sub-surface-platforms,2nd,CHN,,1998,13
+Xia-class,submarines,Nuclear,submarines-and-sub-surface-platforms,1st,CHN,,1987,1
+Yuan-class,submarines,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,3rd,CHN,,2006,20
+Type 212,submarines,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,DEU,,2005,10
+Type 214,submarines,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,DEU,,2007,15
+S-80 Plus-class,submarines,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,ESP,,2023,1
+Barracuda-class,submarines,Nuclear,submarines-and-sub-surface-platforms,4th,FRA,,2020,3
+Triomphant-class,submarines,Nuclear,submarines-and-sub-surface-platforms,2nd,FRA,,1997,4
+Astute-class,submarines,Nuclear,submarines-and-sub-surface-platforms,4th,GBR,,2010,5
+Trafalgar-class,submarines,Nuclear,submarines-and-sub-surface-platforms,3rd,GBR,,1983,6
+Vanguard-class,submarines,Nuclear,submarines-and-sub-surface-platforms,2nd,GBR,,1994,4
+Arihant-class,submarines,Nuclear,submarines-and-sub-surface-platforms,1st,IND,,2016,3
+Oyashio-class,submarines,Diesel-electric,submarines-and-sub-surface-platforms,3rd,JPN,,1998,11
+Sōryū-class,submarines,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,4th,JPN,,2009,12
+Taigei-class,submarines,"Diesel-electric, Lithium-ion",submarines-and-sub-surface-platforms,4th,JPN,,2022,1
+Akula-class,submarines,Nuclear,submarines-and-sub-surface-platforms,4th,RUS,,1984,4
+Belgorod,submarines,Special mission submarine (Nuclear),submarines-and-sub-surface-platforms,4th,RUS,,2022,1
+Borei-class,submarines,Nuclear,submarines-and-sub-surface-platforms,4th,RUS,,2013,7
+Delta-class,submarines,Nuclear,submarines-and-sub-surface-platforms,2nd,RUS,,1984,8
+Kilo-class,submarines,Diesel-electric,submarines-and-sub-surface-platforms,3rd,RUS,,1982,50
+Oscar-class,submarines,Nuclear,submarines-and-sub-surface-platforms,3rd,RUS,,1986,8
+Typhoon-class,submarines,Nuclear,submarines-and-sub-surface-platforms,3rd,RUS,,1981,1
+Yasen-class,submarines,Nuclear,submarines-and-sub-surface-platforms,4th,RUS,,2013,4
+Gotland-class,submarines,"Diesel-electric, AIP",submarines-and-sub-surface-platforms,3rd,SWE,,1996,3
+Los Angeles-class,submarines,Nuclear,submarines-and-sub-surface-platforms,3rd,USA,,1976,24
+Ohio-class (SSGN),submarines,Nuclear (SSGN),submarines-and-sub-surface-platforms,3rd,USA,,2006,4
+Seawolf-class,submarines,Nuclear,submarines-and-sub-surface-platforms,4th,USA,,1997,3
+Virginia-class,submarines,Nuclear,submarines-and-sub-surface-platforms,4th,USA,,2004,22
 MQ-9 Reaper,drones,MALE UCAV (strike/recon),uavs-and-drones,4th,USA,,2007,300
 MQ-1 Predator,drones,MALE UAV (strike/recon),uavs-and-drones,4th,USA,,1995,360
 MQ-1C Gray Eagle,drones,MALE UAV (strike/recon),uavs-and-drones,4th,USA,,2009,204

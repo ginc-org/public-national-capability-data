@@ -33,55 +33,55 @@ F-4 Phantom II,air_combat,Multirole fighter-bomber,air-combat,3rd,USA,,1960,113
 F-5 Tiger II,air_combat,Light fighter,air-combat,3rd,USA,,1964,200
 F/A-18 Hornet,air_combat,Carrier-based multirole fighter,air-combat,4th,USA,,1983,250
 F/A-18E/F Super Hornet,air_combat,Carrier-based multirole fighter,air-combat,4.5,USA,,2001,550
-Type 99,main_battle_tank,MBT (ZTZ99),main-battle-tank-guide,3rd,CHN,,2001,600
-Type 99A,main_battle_tank,MBT (ZTZ99A),main-battle-tank-guide,3rd,CHN,,2011,600
-VT-4 (MBT-3000),main_battle_tank,MBT (exp.),main-battle-tank-guide,3rd,CHN,,2017,234
-Leopard 2,main_battle_tank,MBT,main-battle-tank-guide,3rd,DEU,,1979,2500
-Ramses II,main_battle_tank,Upg. MBT (T-54/55),main-battle-tank-guide,2nd,EGY,,2004,840
-Leclerc,main_battle_tank,MBT (AMX-56),main-battle-tank-guide,3rd,FRA,,1992,627
-Challenger 2,main_battle_tank,MBT,main-battle-tank-guide,3rd,GBR,,1998,196
-Merkava Mk.IV,main_battle_tank,MBT,main-battle-tank-guide,3rd,ISR,,2004,660
-Arjun,main_battle_tank,MBT (Mk.1/Mk.1A),main-battle-tank-guide,3rd,IND,,2004,140
-Karrar,main_battle_tank,MBT (indig.),main-battle-tank-guide,3rd,IND,,2017,420
-Ariete,main_battle_tank,MBT (C1),main-battle-tank-guide,3rd,ITA,,1995,150
-Type 10,main_battle_tank,MBT,main-battle-tank-guide,4th,JPN,,2012,106
-Type 90,main_battle_tank,MBT,main-battle-tank-guide,3rd,JPN,,1990,341
-K1A1/A2,main_battle_tank,MBT (120 mm armmt.),main-battle-tank-guide,3rd,KOR,,1999,484
-K2 Black Panther,main_battle_tank,MBT (advanced),main-battle-tank-guide,4th,KOR,,2014,252
-Al-Khalid,main_battle_tank,MBT (MBT-2000 var.),main-battle-tank-guide,3rd,PAK,,2001,600
-Al-Zarrar,main_battle_tank,Upg. MBT (Type 59 retro.),main-battle-tank-guide,2nd,PAK,,2004,750
-Type 85-IIAP,main_battle_tank,MBT (lic. built),main-battle-tank-guide,3rd,PAK,,1992,410
-PT-91 Twardy,main_battle_tank,MBT (T-72M upgrade),main-battle-tank-guide,3rd,POL,,1995,172
-T-55,main_battle_tank,MBT (med.),main-battle-tank-guide,1st,RUS,,1948,3500
-T-62,main_battle_tank,MBT,main-battle-tank-guide,2nd,RUS,,1961,2000
-T-64,main_battle_tank,MBT,main-battle-tank-guide,2nd,RUS,,1966,1000
-T-72,main_battle_tank,MBT,main-battle-tank-guide,2nd,RUS,,1973,8000
-T-80,main_battle_tank,MBT,main-battle-tank-guide,3rd,RUS,,1976,500
-T-90,main_battle_tank,MBT,main-battle-tank-guide,3rd,RUS,,1992,3000
-Altay,main_battle_tank,MBT (indig.),main-battle-tank-guide,3rd,TUR,,2023,7
-M1 Abrams,main_battle_tank,MBT,main-battle-tank-guide,3rd,USA,,1980,4500
-CAIC Z-10,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,CHN,,2009,120
-Harbin Z-19,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,CHN,,2012,186
-Eurocopter Tiger EC665,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,FRA,,2003,180
-HAL Prachand,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,IND,,2022,15
-HAL Rudra,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,IND,,2012,75
-Panha 2091 Toufan,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,IND,,1998,20
-Agusta A129 Mangusta,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,ITA,,1990,45
-Leonardo AW249 Fenice,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,ITA,,2027,0
-KAI LAH,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,KOR,,2024,0
-Kamov Ka-50 Black Shark,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,RUS,,1995,10
-Kamov Ka-52 Alligator,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,RUS,,2011,164
-Mil Mi-24 Hind,attack_helicopter,Attack Helicopter,attack-helicopter-guide,1st,RUS,,1972,1000
-Mil Mi-28 Havoc,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,RUS,,2009,190
-TAI T929 ATAK 2,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,TUR,,2025,0
-TAI/AgustaWestland T129 ATAK,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,TUR,,2014,80
-Bell 360 Invictus,attack_helicopter,Attack Helicopter,attack-helicopter-guide,5th,USA,,2028,0
-Bell AH-1 Cobra,attack_helicopter,Attack Helicopter,attack-helicopter-guide,1st,USA,,1967,100
-Bell AH-1W SuperCobra,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,USA,,1986,120
-Bell AH-1Z Viper,attack_helicopter,Attack Helicopter,attack-helicopter-guide,4th,USA,,2010,180
-Boeing AH-64 Apache,attack_helicopter,Attack Helicopter,attack-helicopter-guide,2nd,USA,,1986,1200
-Sikorsky Raider X,attack_helicopter,Attack Helicopter,attack-helicopter-guide,5th,USA,,2028,0
-Denel Rooivalk AH-2,attack_helicopter,Attack Helicopter,attack-helicopter-guide,3rd,ZAF,,2011,12
+Type 99,main_battle_tanks,MBT (ZTZ99),main-battle-tank-guide,3rd,CHN,,2001,600
+Type 99A,main_battle_tanks,MBT (ZTZ99A),main-battle-tank-guide,3rd,CHN,,2011,600
+VT-4 (MBT-3000),main_battle_tanks,MBT (exp.),main-battle-tank-guide,3rd,CHN,,2017,234
+Leopard 2,main_battle_tanks,MBT,main-battle-tank-guide,3rd,DEU,,1979,2500
+Ramses II,main_battle_tanks,Upg. MBT (T-54/55),main-battle-tank-guide,2nd,EGY,,2004,840
+Leclerc,main_battle_tanks,MBT (AMX-56),main-battle-tank-guide,3rd,FRA,,1992,627
+Challenger 2,main_battle_tanks,MBT,main-battle-tank-guide,3rd,GBR,,1998,196
+Merkava Mk.IV,main_battle_tanks,MBT,main-battle-tank-guide,3rd,ISR,,2004,660
+Arjun,main_battle_tanks,MBT (Mk.1/Mk.1A),main-battle-tank-guide,3rd,IND,,2004,140
+Karrar,main_battle_tanks,MBT (indig.),main-battle-tank-guide,3rd,IND,,2017,420
+Ariete,main_battle_tanks,MBT (C1),main-battle-tank-guide,3rd,ITA,,1995,150
+Type 10,main_battle_tanks,MBT,main-battle-tank-guide,4th,JPN,,2012,106
+Type 90,main_battle_tanks,MBT,main-battle-tank-guide,3rd,JPN,,1990,341
+K1A1/A2,main_battle_tanks,MBT (120 mm armmt.),main-battle-tank-guide,3rd,KOR,,1999,484
+K2 Black Panther,main_battle_tanks,MBT (advanced),main-battle-tank-guide,4th,KOR,,2014,252
+Al-Khalid,main_battle_tanks,MBT (MBT-2000 var.),main-battle-tank-guide,3rd,PAK,,2001,600
+Al-Zarrar,main_battle_tanks,Upg. MBT (Type 59 retro.),main-battle-tank-guide,2nd,PAK,,2004,750
+Type 85-IIAP,main_battle_tanks,MBT (lic. built),main-battle-tank-guide,3rd,PAK,,1992,410
+PT-91 Twardy,main_battle_tanks,MBT (T-72M upgrade),main-battle-tank-guide,3rd,POL,,1995,172
+T-55,main_battle_tanks,MBT (med.),main-battle-tank-guide,1st,RUS,,1948,3500
+T-62,main_battle_tanks,MBT,main-battle-tank-guide,2nd,RUS,,1961,2000
+T-64,main_battle_tanks,MBT,main-battle-tank-guide,2nd,RUS,,1966,1000
+T-72,main_battle_tanks,MBT,main-battle-tank-guide,2nd,RUS,,1973,8000
+T-80,main_battle_tanks,MBT,main-battle-tank-guide,3rd,RUS,,1976,500
+T-90,main_battle_tanks,MBT,main-battle-tank-guide,3rd,RUS,,1992,3000
+Altay,main_battle_tanks,MBT (indig.),main-battle-tank-guide,3rd,TUR,,2023,7
+M1 Abrams,main_battle_tanks,MBT,main-battle-tank-guide,3rd,USA,,1980,4500
+CAIC Z-10,attack_helicopters,Attack Helicopter,attack-helicopter-guide,4th,CHN,,2009,120
+Harbin Z-19,attack_helicopters,Attack Helicopter,attack-helicopter-guide,3rd,CHN,,2012,186
+Eurocopter Tiger EC665,attack_helicopters,Attack Helicopter,attack-helicopter-guide,3rd,FRA,,2003,180
+HAL Prachand,attack_helicopters,Attack Helicopter,attack-helicopter-guide,4th,IND,,2022,15
+HAL Rudra,attack_helicopters,Attack Helicopter,attack-helicopter-guide,3rd,IND,,2012,75
+Panha 2091 Toufan,attack_helicopters,Attack Helicopter,attack-helicopter-guide,2nd,IND,,1998,20
+Agusta A129 Mangusta,attack_helicopters,Attack Helicopter,attack-helicopter-guide,2nd,ITA,,1990,45
+Leonardo AW249 Fenice,attack_helicopters,Attack Helicopter,attack-helicopter-guide,4th,ITA,,2027,0
+KAI LAH,attack_helicopters,Attack Helicopter,attack-helicopter-guide,4th,KOR,,2024,0
+Kamov Ka-50 Black Shark,attack_helicopters,Attack Helicopter,attack-helicopter-guide,3rd,RUS,,1995,10
+Kamov Ka-52 Alligator,attack_helicopters,Attack Helicopter,attack-helicopter-guide,3rd,RUS,,2011,164
+Mil Mi-24 Hind,attack_helicopters,Attack Helicopter,attack-helicopter-guide,1st,RUS,,1972,1000
+Mil Mi-28 Havoc,attack_helicopters,Attack Helicopter,attack-helicopter-guide,2nd,RUS,,2009,190
+TAI T929 ATAK 2,attack_helicopters,Attack Helicopter,attack-helicopter-guide,4th,TUR,,2025,0
+TAI/AgustaWestland T129 ATAK,attack_helicopters,Attack Helicopter,attack-helicopter-guide,4th,TUR,,2014,80
+Bell 360 Invictus,attack_helicopters,Attack Helicopter,attack-helicopter-guide,5th,USA,,2028,0
+Bell AH-1 Cobra,attack_helicopters,Attack Helicopter,attack-helicopter-guide,1st,USA,,1967,100
+Bell AH-1W SuperCobra,attack_helicopters,Attack Helicopter,attack-helicopter-guide,2nd,USA,,1986,120
+Bell AH-1Z Viper,attack_helicopters,Attack Helicopter,attack-helicopter-guide,4th,USA,,2010,180
+Boeing AH-64 Apache,attack_helicopters,Attack Helicopter,attack-helicopter-guide,2nd,USA,,1986,1200
+Sikorsky Raider X,attack_helicopters,Attack Helicopter,attack-helicopter-guide,5th,USA,,2028,0
+Denel Rooivalk AH-2,attack_helicopters,Attack Helicopter,attack-helicopter-guide,3rd,ZAF,,2011,12
 B-21 Raider,strategic_strike,Stealth nuclear bomber,air-strike,6th,USA,,2027,100
 Xian H-20,strategic_strike,Stealth nuclear bomber,air-strike,6th,CHN,,2027,50
 PAK DA,strategic_strike,Stealth nuclear bomber,air-strike,6th,RUS,,2027,
